@@ -1,0 +1,337 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
+local LocalPlayer = Players.LocalPlayer
+
+local deliveryRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Job"):WaitForChild("DeliveryRemote")
+
+local autoDeliveryActive = false
+local currentTargetPosition = nil
+local currentJobStatus = "NONE"
+local tpCounter = 0
+
+local statusText = nil
+local toggleButton = nil
+
+task.spawn(function()
+    while task.wait(1) do
+        pcall(function()
+            Lighting.ClockTime = 14
+            Lighting.Brightness = 2
+            Lighting.GlobalShadows = false
+        end)
+    end
+end)
+
+local function getJobBasePart()
+    local success, result = pcall(function()
+        return Workspace.Ekonomi.BedilPusat.Job
+    end)
+    if success and result then
+        return result
+    end
+    return nil
+end
+
+local function createDVUI()
+    if CoreGui:FindFirstChild("DVExploitsDelivery") then
+        CoreGui.DVExploitsDelivery:Destroy()
+    end
+
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "DVExploitsDelivery"
+    pcall(function()
+        screenGui.Parent = CoreGui
+    end)
+    if not screenGui.Parent then
+        screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    end
+    screenGui.ResetOnSpawn = false
+    screenGui.DisplayOrder = 999
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Name = "MainFrame"
+    mainFrame.Parent = screenGui
+    mainFrame.BackgroundColor3 = Color3.fromRGB(20, 15, 25)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Position = UDim2.new(0.5, -135, 0.4, -80)
+    mainFrame.Size = UDim2.new(0, 270, 0, 170)
+    mainFrame.Active = true
+    mainFrame.Draggable = true
+
+    local mainCorner = Instance.new("UICorner")
+    mainCorner.CornerRadius = UDim.new(0, 12)
+    mainCorner.Parent = mainFrame
+
+    local border = Instance.new("Frame")
+    border.Name = "Border"
+    border.Parent = mainFrame
+    border.BackgroundColor3 = Color3.fromRGB(120, 60, 200)
+    border.BorderSizePixel = 0
+    border.Size = UDim2.new(1, 2, 1, 2)
+    border.Position = UDim2.new(0, -1, 0, -1)
+    border.BackgroundTransparency = 0.8
+    local borderCorner = Instance.new("UICorner")
+    borderCorner.CornerRadius = UDim.new(0, 13)
+    borderCorner.Parent = border
+
+    local topBar = Instance.new("Frame")
+    topBar.Name = "TopBar"
+    topBar.Parent = mainFrame
+    topBar.BackgroundColor3 = Color3.fromRGB(30, 20, 40)
+    topBar.BorderSizePixel = 0
+    topBar.Size = UDim2.new(1, 0, 0, 40)
+
+    local topCorner = Instance.new("UICorner")
+    topCorner.CornerRadius = UDim.new(0, 12)
+    topCorner.Parent = topBar
+
+    local iconFrame = Instance.new("Frame")
+    iconFrame.Parent = topBar
+    iconFrame.BackgroundColor3 = Color3.fromRGB(140, 70, 220)
+    iconFrame.BorderSizePixel = 0
+    iconFrame.Position = UDim2.new(0, 8, 0.5, -10)
+    iconFrame.Size = UDim2.new(0, 20, 0, 20)
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(1, 0)
+    iconCorner.Parent = iconFrame
+
+    local iconText = Instance.new("TextLabel")
+    iconText.Parent = iconFrame
+    iconText.BackgroundTransparency = 1
+    iconText.Size = UDim2.new(1, 0, 1, 0)
+    iconText.Font = Enum.Font.GothamBold
+    iconText.Text = "DV"
+    iconText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    iconText.TextSize = 10
+    iconText.TextScaled = true
+
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Parent = topBar
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Position = UDim2.new(0, 35, 0, 0)
+    titleLabel.Size = UDim2.new(0, 180, 1, 0)
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.Text = "DV EXPLOITS - DELIVERY"
+    titleLabel.TextColor3 = Color3.fromRGB(180, 120, 255)
+    titleLabel.TextSize = 12
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    local minimizeButton = Instance.new("TextButton")
+    minimizeButton.Parent = topBar
+    minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 40, 80)
+    minimizeButton.Position = UDim2.new(1, -80, 0.5, -12)
+    minimizeButton.Size = UDim2.new(0, 24, 0, 24)
+    minimizeButton.Font = Enum.Font.GothamBold
+    minimizeButton.Text = "−"
+    minimizeButton.TextColor3 = Color3.fromRGB(200, 180, 255)
+    minimizeButton.TextSize = 16
+    minimizeButton.BorderSizePixel = 0
+    local miniCorner = Instance.new("UICorner")
+    miniCorner.CornerRadius = UDim.new(0, 6)
+    miniCorner.Parent = minimizeButton
+
+    local closeButton = Instance.new("TextButton")
+    closeButton.Parent = topBar
+    closeButton.BackgroundColor3 = Color3.fromRGB(180, 40, 60)
+    closeButton.Position = UDim2.new(1, -30, 0.5, -12)
+    closeButton.Size = UDim2.new(0, 24, 0, 24)
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.Text = "✕"
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.TextSize = 14
+    closeButton.BorderSizePixel = 0
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 6)
+    closeCorner.Parent = closeButton
+
+    local contentContainer = Instance.new("Frame")
+    contentContainer.Parent = mainFrame
+    contentContainer.BackgroundTransparency = 1
+    contentContainer.Position = UDim2.new(0, 0, 0, 40)
+    contentContainer.Size = UDim2.new(1, 0, 1, -40)
+
+    statusText = Instance.new("TextLabel")
+    statusText.Parent = contentContainer
+    statusText.BackgroundTransparency = 1
+    statusText.Position = UDim2.new(0, 10, 0, 8)
+    statusText.Size = UDim2.new(1, -20, 0, 25)
+    statusText.Font = Enum.Font.Gotham
+    statusText.Text = autoDeliveryActive and "🔥 Delivery Active!" or "⏸️ Delivery Paused"
+    statusText.TextColor3 = autoDeliveryActive and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(180, 160, 210)
+    statusText.TextSize = 12
+    statusText.TextXAlignment = Enum.TextXAlignment.Center
+
+    toggleButton = Instance.new("TextButton")
+    toggleButton.Parent = contentContainer
+    toggleButton.BackgroundColor3 = autoDeliveryActive and Color3.fromRGB(80, 40, 120) or Color3.fromRGB(150, 40, 40)
+    toggleButton.Position = UDim2.new(0.5, -100, 0, 45)
+    toggleButton.Size = UDim2.new(0, 200, 0, 40)
+    toggleButton.Font = Enum.Font.GothamBold
+    toggleButton.Text = autoDeliveryActive and "🔴 STOP DELIVERY" or "🟢 START DELIVERY"
+    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleButton.TextSize = 12
+    toggleButton.BorderSizePixel = 0
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(0, 8)
+    toggleCorner.Parent = toggleButton
+
+    local infoText = Instance.new("TextLabel")
+    infoText.Parent = contentContainer
+    infoText.BackgroundTransparency = 1
+    infoText.Position = UDim2.new(0, 10, 0, 95)
+    infoText.Size = UDim2.new(1, -20, 0, 20)
+    infoText.Font = Enum.Font.Gotham
+    infoText.Text = "⚡ Anti-Cheat Cooldown: 3s"
+    infoText.TextColor3 = Color3.fromRGB(150, 130, 180)
+    infoText.TextSize = 10
+    infoText.TextXAlignment = Enum.TextXAlignment.Center
+
+    local dragging, dragStart, startPos
+    topBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = mainFrame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    local isMinimized = false
+    minimizeButton.MouseButton1Click:Connect(function()
+        isMinimized = not isMinimized
+        contentContainer.Visible = not isMinimized
+        mainFrame.Size = isMinimized and UDim2.new(0, 270, 0, 40) or UDim2.new(0, 270, 0, 170)
+        minimizeButton.Text = isMinimized and "⊕" or "−"
+    end)
+
+    closeButton.MouseButton1Click:Connect(function()
+        screenGui:Destroy()
+        autoDeliveryActive = false
+    end)
+
+    toggleButton.MouseButton1Click:Connect(function()
+        autoDeliveryActive = not autoDeliveryActive
+        if autoDeliveryActive then
+            toggleButton.Text = "🔴 STOP DELIVERY"
+            toggleButton.BackgroundColor3 = Color3.fromRGB(80, 40, 120)
+            if statusText then 
+                statusText.Text = "🔥 Delivery Active!"
+                statusText.TextColor3 = Color3.fromRGB(100, 255, 100)
+            end
+        else
+            toggleButton.Text = "🟢 START DELIVERY"
+            toggleButton.BackgroundColor3 = Color3.fromRGB(150, 40, 40)
+            if statusText then 
+                statusText.Text = "⏸️ Delivery Paused"
+                statusText.TextColor3 = Color3.fromRGB(180, 160, 210)
+            end
+        end
+    end)
+end
+
+createDVUI()
+
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(2)
+    if not CoreGui:FindFirstChild("DVExploitsDelivery") then
+        createDVUI()
+    end
+end)
+
+deliveryRemote.OnClientEvent:Connect(function(param1, param2)
+    if typeof(param1) == "string" then
+        currentJobStatus = param1
+        if param1 == "JOB_FINISHED" or param1 == "JOB_ENDED" then
+            currentTargetPosition = nil
+        end
+    elseif typeof(param1) == "Vector3" then
+        currentTargetPosition = param1
+    end
+end)
+
+task.spawn(function()
+    while task.wait(0.1) do
+        if autoDeliveryActive then
+            pcall(function()
+                local character = LocalPlayer.Character
+                if not character then return end
+                
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                local seat = character:FindFirstChildOfClass("Humanoid") and character.Humanoid.SeatPart
+                
+                local targetObject = nil
+                if seat and seat.Parent then
+                    targetObject = seat.Parent:FindFirstChild("PrimaryPart") or seat.Parent
+                elseif humanoidRootPart then
+                    targetObject = humanoidRootPart
+                end
+
+                if targetObject then
+                    tpCounter = tpCounter + 1
+                    
+                    if tpCounter >= 3 then
+                        if statusText then 
+                            statusText.Text = "⏳ Cooldown 3s..."
+                            statusText.TextColor3 = Color3.fromRGB(255, 200, 100)
+                        end
+                        
+                        for i = 1, 30 do
+                            if not autoDeliveryActive then break end
+                            task.wait(0.1)
+                        end
+                        
+                        tpCounter = 0  
+                        if autoDeliveryActive and statusText then 
+                            statusText.Text = "🔥 Delivery Active!"
+                            statusText.TextColor3 = Color3.fromRGB(100, 255, 100)
+                        end
+                    end
+
+                    if not autoDeliveryActive then return end
+
+                    if currentTargetPosition then
+                        if targetObject:IsA("Model") and targetObject.PrimaryPart then
+                            targetObject:SetPrimaryPartCFrame(CFrame.new(currentTargetPosition + Vector3.new(0, 3, 0)))
+                        elseif targetObject:IsA("BasePart") then
+                            targetObject.CFrame = CFrame.new(currentTargetPosition + Vector3.new(0, 3, 0))
+                        end
+                    else
+                        local jobBase = getJobBasePart()
+                        if jobBase then
+                            local baseCFrame = jobBase:IsA("BasePart") and jobBase.CFrame or (jobBase:IsA("Model") and jobBase.PrimaryPart and jobBase.PrimaryPart.CFrame)
+                            if baseCFrame then
+                                if targetObject:IsA("Model") and targetObject.PrimaryPart then
+                                    targetObject:SetPrimaryPartCFrame(baseCFrame + Vector3.new(0, 3, 0))
+                                elseif targetObject:IsA("BasePart") then
+                                    targetObject.CFrame = baseCFrame + Vector3.new(0, 3, 0)
+                                end
+                            end
+                        end
+                        
+                        if statusText and not statusText.Text:find("Cooldown") then
+                            statusText.Text = "📍 Menuju Pangkalan Job..."
+                            statusText.TextColor3 = Color3.fromRGB(200, 160, 255)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+print("[DV EXPLOITS] Auto Delivery Final Loaded! 🚚🔥")
