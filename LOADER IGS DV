@@ -182,7 +182,7 @@ deliveryToggle.MouseButton1Click:Connect(function()
     end
 
     local success, err = pcall(function()
-        loadstring(game:HttpGet("https://pastefy.app/xxj0fgam/raw"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Kzaee12/PROJECT-IGS-FARM/refs/heads/main/DELIVERY%20FARM"))()
     end)
 
     if success then
@@ -212,7 +212,7 @@ brewokToggle.MouseButton1Click:Connect(function()
     end
 
     local success, err = pcall(function()
-        loadstring(game:HttpGet("https://pastefy.app/qTV34iJL/raw"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Kzaee12/PROJECT-IGS-FARM/refs/heads/main/BREWOK%20FARM"))()
     end)
 
     if success then
