@@ -1,0 +1,234 @@
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+if CoreGui:FindFirstChild("DVExploitsLauncher") then
+    CoreGui.DVExploitsLauncher:Destroy()
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "DVExploitsLauncher"
+screenGui.ResetOnSpawn = false
+screenGui.DisplayOrder = 999
+screenGui.Parent = CoreGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Parent = screenGui
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 15, 25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Position = UDim2.new(0.5, -140, 0.4, -80)
+mainFrame.Size = UDim2.new(0, 280, 0, 180)
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.Parent = mainFrame
+
+local border = Instance.new("Frame")
+border.Name = "Border"
+border.Parent = mainFrame
+border.BackgroundColor3 = Color3.fromRGB(120, 60, 200)
+border.BorderSizePixel = 0
+border.Size = UDim2.new(1, 2, 1, 2)
+border.Position = UDim2.new(0, -1, 0, -1)
+border.BackgroundTransparency = 0.8
+local borderCorner = Instance.new("UICorner")
+borderCorner.CornerRadius = UDim.new(0, 13)
+borderCorner.Parent = border
+
+local topBar = Instance.new("Frame")
+topBar.Name = "TopBar"
+topBar.Parent = mainFrame
+topBar.BackgroundColor3 = Color3.fromRGB(30, 20, 40)
+topBar.BorderSizePixel = 0
+topBar.Size = UDim2.new(1, 0, 0, 40)
+
+local topCorner = Instance.new("UICorner")
+topCorner.CornerRadius = UDim.new(0, 12)
+topCorner.Parent = topBar
+
+local iconFrame = Instance.new("Frame")
+iconFrame.Parent = topBar
+iconFrame.BackgroundColor3 = Color3.fromRGB(140, 70, 220)
+iconFrame.BorderSizePixel = 0
+iconFrame.Position = UDim2.new(0, 8, 0.5, -10)
+iconFrame.Size = UDim2.new(0, 20, 0, 20)
+local iconCorner = Instance.new("UICorner")
+iconCorner.CornerRadius = UDim.new(1, 0)
+iconCorner.Parent = iconFrame
+
+local iconText = Instance.new("TextLabel")
+iconText.Parent = iconFrame
+iconText.BackgroundTransparency = 1
+iconText.Size = UDim2.new(1, 0, 1, 0)
+iconText.Font = Enum.Font.GothamBold
+iconText.Text = "DV"
+iconText.TextColor3 = Color3.fromRGB(255, 255, 255)
+iconText.TextSize = 10
+iconText.TextScaled = true
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Parent = topBar
+titleLabel.BackgroundTransparency = 1
+titleLabel.Position = UDim2.new(0, 35, 0, 0)
+titleLabel.Size = UDim2.new(0, 180, 1, 0)
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.Text = "DV EXPLOITS LAUNCHER"
+titleLabel.TextColor3 = Color3.fromRGB(180, 120, 255)
+titleLabel.TextSize = 12
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Parent = topBar
+minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 40, 80)
+minimizeButton.Position = UDim2.new(1, -80, 0.5, -12)
+minimizeButton.Size = UDim2.new(0, 24, 0, 24)
+minimizeButton.Font = Enum.Font.GothamBold
+minimizeButton.Text = "−"
+minimizeButton.TextColor3 = Color3.fromRGB(200, 180, 255)
+minimizeButton.TextSize = 16
+minimizeButton.BorderSizePixel = 0
+local miniCorner = Instance.new("UICorner")
+miniCorner.CornerRadius = UDim.new(0, 6)
+miniCorner.Parent = minimizeButton
+
+local closeButton = Instance.new("TextButton")
+closeButton.Parent = topBar
+closeButton.BackgroundColor3 = Color3.fromRGB(180, 40, 60)
+closeButton.Position = UDim2.new(1, -30, 0.5, -12)
+closeButton.Size = UDim2.new(0, 24, 0, 24)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Text = "✕"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 14
+closeButton.BorderSizePixel = 0
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeButton
+
+local contentContainer = Instance.new("Frame")
+contentContainer.Parent = mainFrame
+contentContainer.BackgroundTransparency = 1
+contentContainer.Position = UDim2.new(0, 0, 0, 40)
+contentContainer.Size = UDim2.new(1, 0, 1, -40)
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Parent = contentContainer
+statusLabel.BackgroundTransparency = 1
+statusLabel.Position = UDim2.new(0, 10, 0, 5)
+statusLabel.Size = UDim2.new(1, -20, 0, 20)
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.Text = "🚀 Pilih Script yang Mau Di Load"
+statusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+statusLabel.TextSize = 11
+statusLabel.TextXAlignment = Enum.TextXAlignment.Center
+
+local deliveryToggle = Instance.new("TextButton")
+deliveryToggle.Parent = contentContainer
+deliveryToggle.BackgroundColor3 = Color3.fromRGB(50, 30, 70)
+deliveryToggle.Position = UDim2.new(0, 15, 0, 35)
+deliveryToggle.Size = UDim2.new(1, -30, 0, 40)
+deliveryToggle.Font = Enum.Font.GothamBold
+deliveryToggle.Text = "🚚 LOAD DELIVERY FARMING"
+deliveryToggle.TextColor3 = Color3.fromRGB(200, 180, 255)
+deliveryToggle.TextSize = 12
+deliveryToggle.BorderSizePixel = 0
+local delCorner = Instance.new("UICorner")
+delCorner.CornerRadius = UDim.new(0, 8)
+delCorner.Parent = deliveryToggle
+
+local brewokToggle = Instance.new("TextButton")
+brewokToggle.Parent = contentContainer
+brewokToggle.BackgroundColor3 = Color3.fromRGB(50, 30, 70)
+brewokToggle.Position = UDim2.new(0, 15, 0, 85)
+brewokToggle.Size = UDim2.new(1, -30, 0, 40)
+brewokToggle.Font = Enum.Font.GothamBold
+brewokToggle.Text = "🍺 LOAD BREWOK FARMING"
+brewokToggle.TextColor3 = Color3.fromRGB(200, 180, 255)
+brewokToggle.TextSize = 12
+brewokToggle.BorderSizePixel = 0
+local brewCorner = Instance.new("UICorner")
+brewCorner.CornerRadius = UDim.new(0, 8)
+brewCorner.Parent = brewokToggle
+
+local isMinimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    contentContainer.Visible = not isMinimized
+    mainFrame.Size = isMinimized and UDim2.new(0, 280, 0, 40) or UDim2.new(0, 280, 0, 180)
+    minimizeButton.Text = isMinimized and "⊕" or "−"
+end)
+
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+    if CoreGui:FindFirstChild("DVExploitsDelivery") then
+        CoreGui.DVExploitsDelivery:Destroy()
+    end
+    if CoreGui:FindFirstChild("DVExploitsBrewok") then
+        CoreGui.DVExploitsBrewok:Destroy()
+    end
+end)
+
+deliveryToggle.MouseButton1Click:Connect(function()
+    if CoreGui:FindFirstChild("DVExploitsDelivery") then
+        statusLabel.Text = "⚠️ Delivery Sudah Active!"
+        statusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
+        task.wait(1.5)
+        statusLabel.Text = "🚀 Pilih Script yang Mau Di Load"
+        statusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+        return
+    end
+
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://pastefy.app/xxj0fgam/raw"))()
+    end)
+
+    if success then
+        statusLabel.Text = "✅ Delivery Loaded!"
+        statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        deliveryToggle.BackgroundColor3 = Color3.fromRGB(80, 40, 120)
+        task.wait(1.5)
+        statusLabel.Text = "🚀 Pilih Script yang Mau Di Load"
+        statusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+    else
+        statusLabel.Text = "❌ Gagal Load Delivery!"
+        statusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        task.wait(1.5)
+        statusLabel.Text = "🚀 Pilih Script yang Mau Di Load"
+        statusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+    end
+end)
+
+brewokToggle.MouseButton1Click:Connect(function()
+    if CoreGui:FindFirstChild("DVExploitsBrewok") then
+        statusLabel.Text = "⚠️ Brewok Sudah Active!"
+        statusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
+        task.wait(1.5)
+        statusLabel.Text = "🚀 Pilih Script yang Mau Di Load"
+        statusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+        return
+    end
+
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://pastefy.app/qTV34iJL/raw"))()
+    end)
+
+    if success then
+        statusLabel.Text = "✅ Brewok Loaded!"
+        statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        brewokToggle.BackgroundColor3 = Color3.fromRGB(80, 40, 120)
+        task.wait(1.5)
+        statusLabel.Text = "🚀 Pilih Script yang Mau Di Load"
+        statusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+    else
+        statusLabel.Text = "❌ Gagal Load Brewok!"
+        statusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        task.wait(1.5)
+        statusLabel.Text = "🚀 Pilih Script yang Mau Di Load"
+        statusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+    end
+end)
+
+print("[DV EXPLOITS] Launcher Hub Loaded! 🚀")
