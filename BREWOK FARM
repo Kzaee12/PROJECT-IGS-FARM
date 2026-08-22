@@ -1,0 +1,500 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+if game.CoreGui:FindFirstChild("DVExploitsBrewok") then
+    game.CoreGui.DVExploitsBrewok:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DVExploitsBrewok"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.DisplayOrder = 999
+pcall(function()
+    ScreenGui.Parent = game.CoreGui
+end)
+if not ScreenGui.Parent then
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+end
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 15, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -120, 0.5, -80)
+MainFrame.Size = UDim2.new(0, 240, 0, 170)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.Parent = MainFrame
+
+local border = Instance.new("Frame")
+border.Name = "Border"
+border.Parent = MainFrame
+border.BackgroundColor3 = Color3.fromRGB(120, 60, 200)
+border.BorderSizePixel = 0
+border.Size = UDim2.new(1, 2, 1, 2)
+border.Position = UDim2.new(0, -1, 0, -1)
+border.BackgroundTransparency = 0.8
+local borderCorner = Instance.new("UICorner")
+borderCorner.CornerRadius = UDim.new(0, 13)
+borderCorner.Parent = border
+
+local Header = Instance.new("Frame")
+Header.Name = "Header"
+Header.Parent = MainFrame
+Header.BackgroundColor3 = Color3.fromRGB(30, 20, 40)
+Header.BorderSizePixel = 0
+Header.Size = UDim2.new(1, 0, 0, 40)
+
+local headerCorner = Instance.new("UICorner")
+headerCorner.CornerRadius = UDim.new(0, 12)
+headerCorner.Parent = Header
+
+local iconFrame = Instance.new("Frame")
+iconFrame.Parent = Header
+iconFrame.BackgroundColor3 = Color3.fromRGB(140, 70, 220)
+iconFrame.BorderSizePixel = 0
+iconFrame.Position = UDim2.new(0, 8, 0.5, -10)
+iconFrame.Size = UDim2.new(0, 20, 0, 20)
+local iconCorner = Instance.new("UICorner")
+iconCorner.CornerRadius = UDim.new(1, 0)
+iconCorner.Parent = iconFrame
+
+local iconText = Instance.new("TextLabel")
+iconText.Parent = iconFrame
+iconText.BackgroundTransparency = 1
+iconText.Size = UDim2.new(1, 0, 1, 0)
+iconText.Font = Enum.Font.GothamBold
+iconText.Text = "DV"
+iconText.TextColor3 = Color3.fromRGB(255, 255, 255)
+iconText.TextSize = 10
+iconText.TextScaled = true
+
+local Title = Instance.new("TextLabel")
+Title.Parent = Header
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 35, 0, 0)
+Title.Size = UDim2.new(0, 150, 1, 0)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "DV EXPLOITS - BREWOK"
+Title.TextColor3 = Color3.fromRGB(180, 120, 255)
+Title.TextSize = 12
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+local MiniBtn = Instance.new("TextButton")
+MiniBtn.Parent = Header
+MiniBtn.BackgroundColor3 = Color3.fromRGB(60, 40, 80)
+MiniBtn.Position = UDim2.new(1, -80, 0.5, -12)
+MiniBtn.Size = UDim2.new(0, 24, 0, 24)
+MiniBtn.Font = Enum.Font.GothamBold
+MiniBtn.Text = "−"
+MiniBtn.TextColor3 = Color3.fromRGB(200, 180, 255)
+MiniBtn.TextSize = 16
+MiniBtn.BorderSizePixel = 0
+local miniCorner = Instance.new("UICorner")
+miniCorner.CornerRadius = UDim.new(0, 6)
+miniCorner.Parent = MiniBtn
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Parent = Header
+CloseBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 60)
+CloseBtn.Position = UDim2.new(1, -30, 0.5, -12)
+CloseBtn.Size = UDim2.new(0, 24, 0, 24)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.Text = "✕"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.TextSize = 14
+CloseBtn.BorderSizePixel = 0
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = CloseBtn
+
+local Content = Instance.new("Frame")
+Content.Parent = MainFrame
+Content.BackgroundTransparency = 1
+Content.Position = UDim2.new(0, 0, 0, 40)
+Content.Size = UDim2.new(1, 0, 1, -40)
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Parent = Content
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Position = UDim2.new(0, 10, 0, 5)
+StatusLabel.Size = UDim2.new(1, -20, 0, 20)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.Text = "Status: Siap"
+StatusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+StatusLabel.TextSize = 11
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local TpButton = Instance.new("TextButton")
+TpButton.Parent = Content
+TpButton.BackgroundColor3 = Color3.fromRGB(40, 25, 60)
+TpButton.Position = UDim2.new(0, 15, 0, 30)
+TpButton.Size = UDim2.new(1, -30, 0, 35)
+TpButton.Font = Enum.Font.GothamBold
+TpButton.Text = "📍 TP KE BREWOK"
+TpButton.TextColor3 = Color3.fromRGB(200, 180, 255)
+TpButton.TextSize = 11
+TpButton.BorderSizePixel = 0
+local tpCorner = Instance.new("UICorner")
+tpCorner.CornerRadius = UDim.new(0, 8)
+tpCorner.Parent = TpButton
+
+local FarmButton = Instance.new("TextButton")
+FarmButton.Parent = Content
+FarmButton.BackgroundColor3 = Color3.fromRGB(150, 40, 40)
+FarmButton.Position = UDim2.new(0, 15, 0, 75)
+FarmButton.Size = UDim2.new(1, -30, 0, 35)
+FarmButton.Font = Enum.Font.GothamBold
+FarmButton.Text = "🍺 FARMING: OFF"
+FarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+FarmButton.TextSize = 12
+FarmButton.BorderSizePixel = 0
+local farmCorner = Instance.new("UICorner")
+farmCorner.CornerRadius = UDim.new(0, 8)
+farmCorner.Parent = FarmButton
+
+local isMinimized = false
+MiniBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    Content.Visible = not isMinimized
+    MainFrame.Size = isMinimized and UDim2.new(0, 240, 0, 40) or UDim2.new(0, 240, 0, 170)
+    MiniBtn.Text = isMinimized and "⊕" or "−"
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+TpButton.MouseButton1Click:Connect(function()
+    pcall(function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(4027.13, 23.7, -415.86)
+            StatusLabel.Text = "✅ TP ke Brewok!"
+            StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+            task.wait(1.5)
+            StatusLabel.Text = "Status: Siap"
+            StatusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+        end
+    end)
+end)
+
+local farmingActive = false
+FarmButton.MouseButton1Click:Connect(function()
+    farmingActive = not farmingActive
+    
+    if farmingActive then
+        FarmButton.BackgroundColor3 = Color3.fromRGB(80, 40, 120)
+        FarmButton.Text = "🍺 FARMING: ON"
+        StatusLabel.Text = "🔥 Farming Active!"
+        StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+    else
+        FarmButton.BackgroundColor3 = Color3.fromRGB(150, 40, 40)
+        FarmButton.Text = "🍺 FARMING: OFF"
+        StatusLabel.Text = "⏸️ Farming Paused"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
+    end
+    
+    if farmingActive then
+        task.spawn(function()
+            while farmingActive do
+                pcall(function()
+                    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        local activeFolder = game.Workspace:FindFirstChild("Ekonomi") and game.Workspace.Ekonomi:FindFirstChild("ActiveJobs")
+                        local jobFolder = game.Workspace:FindFirstChild("Ekonomi") and game.Workspace.Ekonomi:FindFirstChild("Job")
+                        local targets = {}
+                        
+                        if jobFolder and jobFolder:FindFirstChild("Brewog") then 
+                            table.insert(targets, jobFolder.Brewog) 
+                        end
+                        
+                        if activeFolder then
+                            for _, f in ipairs(activeFolder:GetChildren()) do
+                                if f.Name:match("^Brewog") then
+                                    if f:FindFirstChild("TempatAmbil") then 
+                                        table.insert(targets, f.TempatAmbil) 
+                                    end
+                                    if f:FindFirstChild("TempatTaruh1") then 
+                                        table.insert(targets, f.TempatTaruh1) 
+                                    end
+                                    if f:FindFirstChild("TempatTaruh2") then 
+                                        table.insert(targets, f.TempatTaruh2) 
+                                    end
+                                end
+                            end
+                        end
+                        
+                        for _, p in ipairs(targets) do 
+                            if p:IsA("BasePart") then 
+                                p.CanCollide = false
+                                p.Anchored = false
+                                p.CFrame = hrp.CFrame
+                            end
+                        end
+                    end
+                end)
+                RunService.Heartbeat:Wait()
+            end
+        end)
+    end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(2)
+    if not game.CoreGui:FindFirstChild("DVExploitsBrewok") then
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+        local UserInputService = game:GetService("UserInputService")
+        local LocalPlayer = Players.LocalPlayer
+        
+        if game.CoreGui:FindFirstChild("DVExploitsBrewok") then
+            game.CoreGui.DVExploitsBrewok:Destroy()
+        end
+        
+        local ScreenGui = Instance.new("ScreenGui")
+        ScreenGui.Name = "DVExploitsBrewok"
+        ScreenGui.ResetOnSpawn = false
+        ScreenGui.DisplayOrder = 999
+        pcall(function()
+            ScreenGui.Parent = game.CoreGui
+        end)
+        if not ScreenGui.Parent then
+            ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+        end
+        
+        local MainFrame = Instance.new("Frame")
+        MainFrame.Name = "MainFrame"
+        MainFrame.Parent = ScreenGui
+        MainFrame.BackgroundColor3 = Color3.fromRGB(20, 15, 25)
+        MainFrame.BorderSizePixel = 0
+        MainFrame.Position = UDim2.new(0.5, -120, 0.5, -80)
+        MainFrame.Size = UDim2.new(0, 240, 0, 170)
+        MainFrame.Active = true
+        MainFrame.Draggable = true
+        
+        local mainCorner = Instance.new("UICorner")
+        mainCorner.CornerRadius = UDim.new(0, 12)
+        mainCorner.Parent = MainFrame
+        
+        local border = Instance.new("Frame")
+        border.Name = "Border"
+        border.Parent = MainFrame
+        border.BackgroundColor3 = Color3.fromRGB(120, 60, 200)
+        border.BorderSizePixel = 0
+        border.Size = UDim2.new(1, 2, 1, 2)
+        border.Position = UDim2.new(0, -1, 0, -1)
+        border.BackgroundTransparency = 0.8
+        local borderCorner = Instance.new("UICorner")
+        borderCorner.CornerRadius = UDim.new(0, 13)
+        borderCorner.Parent = border
+        
+        local Header = Instance.new("Frame")
+        Header.Name = "Header"
+        Header.Parent = MainFrame
+        Header.BackgroundColor3 = Color3.fromRGB(30, 20, 40)
+        Header.BorderSizePixel = 0
+        Header.Size = UDim2.new(1, 0, 0, 40)
+        
+        local headerCorner = Instance.new("UICorner")
+        headerCorner.CornerRadius = UDim.new(0, 12)
+        headerCorner.Parent = Header
+        
+        local iconFrame = Instance.new("Frame")
+        iconFrame.Parent = Header
+        iconFrame.BackgroundColor3 = Color3.fromRGB(140, 70, 220)
+        iconFrame.BorderSizePixel = 0
+        iconFrame.Position = UDim2.new(0, 8, 0.5, -10)
+        iconFrame.Size = UDim2.new(0, 20, 0, 20)
+        local iconCorner = Instance.new("UICorner")
+        iconCorner.CornerRadius = UDim.new(1, 0)
+        iconCorner.Parent = iconFrame
+        
+        local iconText = Instance.new("TextLabel")
+        iconText.Parent = iconFrame
+        iconText.BackgroundTransparency = 1
+        iconText.Size = UDim2.new(1, 0, 1, 0)
+        iconText.Font = Enum.Font.GothamBold
+        iconText.Text = "DV"
+        iconText.TextColor3 = Color3.fromRGB(255, 255, 255)
+        iconText.TextSize = 10
+        iconText.TextScaled = true
+        
+        local Title = Instance.new("TextLabel")
+        Title.Parent = Header
+        Title.BackgroundTransparency = 1
+        Title.Position = UDim2.new(0, 35, 0, 0)
+        Title.Size = UDim2.new(0, 150, 1, 0)
+        Title.Font = Enum.Font.GothamBold
+        Title.Text = "DV EXPLOITS - BREWOK"
+        Title.TextColor3 = Color3.fromRGB(180, 120, 255)
+        Title.TextSize = 12
+        Title.TextXAlignment = Enum.TextXAlignment.Left
+        
+        local MiniBtn = Instance.new("TextButton")
+        MiniBtn.Parent = Header
+        MiniBtn.BackgroundColor3 = Color3.fromRGB(60, 40, 80)
+        MiniBtn.Position = UDim2.new(1, -80, 0.5, -12)
+        MiniBtn.Size = UDim2.new(0, 24, 0, 24)
+        MiniBtn.Font = Enum.Font.GothamBold
+        MiniBtn.Text = "−"
+        MiniBtn.TextColor3 = Color3.fromRGB(200, 180, 255)
+        MiniBtn.TextSize = 16
+        MiniBtn.BorderSizePixel = 0
+        local miniCorner = Instance.new("UICorner")
+        miniCorner.CornerRadius = UDim.new(0, 6)
+        miniCorner.Parent = MiniBtn
+        
+        local CloseBtn = Instance.new("TextButton")
+        CloseBtn.Parent = Header
+        CloseBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 60)
+        CloseBtn.Position = UDim2.new(1, -30, 0.5, -12)
+        CloseBtn.Size = UDim2.new(0, 24, 0, 24)
+        CloseBtn.Font = Enum.Font.GothamBold
+        CloseBtn.Text = "✕"
+        CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        CloseBtn.TextSize = 14
+        CloseBtn.BorderSizePixel = 0
+        local closeCorner = Instance.new("UICorner")
+        closeCorner.CornerRadius = UDim.new(0, 6)
+        closeCorner.Parent = CloseBtn
+        
+        local Content = Instance.new("Frame")
+        Content.Parent = MainFrame
+        Content.BackgroundTransparency = 1
+        Content.Position = UDim2.new(0, 0, 0, 40)
+        Content.Size = UDim2.new(1, 0, 1, -40)
+        
+        local StatusLabel = Instance.new("TextLabel")
+        StatusLabel.Parent = Content
+        StatusLabel.BackgroundTransparency = 1
+        StatusLabel.Position = UDim2.new(0, 10, 0, 5)
+        StatusLabel.Size = UDim2.new(1, -20, 0, 20)
+        StatusLabel.Font = Enum.Font.Gotham
+        StatusLabel.Text = "Status: Siap"
+        StatusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+        StatusLabel.TextSize = 11
+        StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+        
+        local TpButton = Instance.new("TextButton")
+        TpButton.Parent = Content
+        TpButton.BackgroundColor3 = Color3.fromRGB(40, 25, 60)
+        TpButton.Position = UDim2.new(0, 15, 0, 30)
+        TpButton.Size = UDim2.new(1, -30, 0, 35)
+        TpButton.Font = Enum.Font.GothamBold
+        TpButton.Text = "📍 TP KE BREWOK"
+        TpButton.TextColor3 = Color3.fromRGB(200, 180, 255)
+        TpButton.TextSize = 11
+        TpButton.BorderSizePixel = 0
+        local tpCorner = Instance.new("UICorner")
+        tpCorner.CornerRadius = UDim.new(0, 8)
+        tpCorner.Parent = TpButton
+        
+        local FarmButton = Instance.new("TextButton")
+        FarmButton.Parent = Content
+        FarmButton.BackgroundColor3 = Color3.fromRGB(150, 40, 40)
+        FarmButton.Position = UDim2.new(0, 15, 0, 75)
+        FarmButton.Size = UDim2.new(1, -30, 0, 35)
+        FarmButton.Font = Enum.Font.GothamBold
+        FarmButton.Text = "🍺 FARMING: OFF"
+        FarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        FarmButton.TextSize = 12
+        FarmButton.BorderSizePixel = 0
+        local farmCorner = Instance.new("UICorner")
+        farmCorner.CornerRadius = UDim.new(0, 8)
+        farmCorner.Parent = FarmButton
+        
+        local isMinimized = false
+        MiniBtn.MouseButton1Click:Connect(function()
+            isMinimized = not isMinimized
+            Content.Visible = not isMinimized
+            MainFrame.Size = isMinimized and UDim2.new(0, 240, 0, 40) or UDim2.new(0, 240, 0, 170)
+            MiniBtn.Text = isMinimized and "⊕" or "−"
+        end)
+        
+        CloseBtn.MouseButton1Click:Connect(function()
+            ScreenGui:Destroy()
+        end)
+        
+        TpButton.MouseButton1Click:Connect(function()
+            pcall(function()
+                if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(4027.13, 23.7, -415.86)
+                    StatusLabel.Text = "✅ TP ke Brewok!"
+                    StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+                    task.wait(1.5)
+                    StatusLabel.Text = "Status: Siap"
+                    StatusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+                end
+            end)
+        end)
+        
+        local farmingActive = false
+        FarmButton.MouseButton1Click:Connect(function()
+            farmingActive = not farmingActive
+            
+            if farmingActive then
+                FarmButton.BackgroundColor3 = Color3.fromRGB(80, 40, 120)
+                FarmButton.Text = "🍺 FARMING: ON"
+                StatusLabel.Text = "🔥 Farming Active!"
+                StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+            else
+                FarmButton.BackgroundColor3 = Color3.fromRGB(150, 40, 40)
+                FarmButton.Text = "🍺 FARMING: OFF"
+                StatusLabel.Text = "⏸️ Farming Paused"
+                StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
+            end
+            
+            if farmingActive then
+                task.spawn(function()
+                    while farmingActive do
+                        pcall(function()
+                            local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                            if hrp then
+                                local activeFolder = game.Workspace:FindFirstChild("Ekonomi") and game.Workspace.Ekonomi:FindFirstChild("ActiveJobs")
+                                local jobFolder = game.Workspace:FindFirstChild("Ekonomi") and game.Workspace.Ekonomi:FindFirstChild("Job")
+                                local targets = {}
+                                
+                                if jobFolder and jobFolder:FindFirstChild("Brewog") then 
+                                    table.insert(targets, jobFolder.Brewog) 
+                                end
+                                
+                                if activeFolder then
+                                    for _, f in ipairs(activeFolder:GetChildren()) do
+                                        if f.Name:match("^Brewog") then
+                                            if f:FindFirstChild("TempatAmbil") then 
+                                                table.insert(targets, f.TempatAmbil) 
+                                            end
+                                            if f:FindFirstChild("TempatTaruh1") then 
+                                                table.insert(targets, f.TempatTaruh1) 
+                                            end
+                                            if f:FindFirstChild("TempatTaruh2") then 
+                                                table.insert(targets, f.TempatTaruh2) 
+                                            end
+                                        end
+                                    end
+                                end
+                                
+                                for _, p in ipairs(targets) do 
+                                    if p:IsA("BasePart") then 
+                                        p.CanCollide = false
+                                        p.Anchored = false
+                                        p.CFrame = hrp.CFrame
+                                    end
+                                end
+                            end
+                        end)
+                        RunService.Heartbeat:Wait()
+                    end
+                end)
+            end
+        end)
+    end
+end)
+
+print("[DV EXPLOITS] Brewok Farming Loaded! 🍺")
