@@ -15,6 +15,7 @@ local tpCounter = 0
 
 local statusText = nil
 local toggleButton = nil
+local manualTpButton = nil
 
 task.spawn(function()
     while task.wait(1) do
@@ -34,6 +35,30 @@ local function getJobBasePart()
         return result
     end
     return nil
+end
+
+local function teleportToPosition(pos)
+    pcall(function()
+        local character = LocalPlayer.Character
+        if not character then return end
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        local seat = character:FindFirstChildOfClass("Humanoid") and character.Humanoid.SeatPart
+        
+        local targetObject = nil
+        if seat and seat.Parent then
+            targetObject = seat.Parent:FindFirstChild("PrimaryPart") or seat.Parent
+        elseif humanoidRootPart then
+            targetObject = humanoidRootPart
+        end
+
+        if targetObject then
+            if targetObject:IsA("Model") and targetObject.PrimaryPart then
+                targetObject:SetPrimaryPartCFrame(CFrame.new(pos + Vector3.new(0, 3, 0)))
+            elseif targetObject:IsA("BasePart") then
+                targetObject.CFrame = CFrame.new(pos + Vector3.new(0, 3, 0))
+            end
+        end
+    end)
 end
 
 local function createDVUI()
@@ -57,8 +82,8 @@ local function createDVUI()
     mainFrame.Parent = screenGui
     mainFrame.BackgroundColor3 = Color3.fromRGB(20, 15, 25)
     mainFrame.BorderSizePixel = 0
-    mainFrame.Position = UDim2.new(0.5, -135, 0.4, -80)
-    mainFrame.Size = UDim2.new(0, 270, 0, 170)
+    mainFrame.Position = UDim2.new(0.5, -135, 0.4, -95)
+    mainFrame.Size = UDim2.new(0, 270, 0, 215)
     mainFrame.Active = true
     mainFrame.Draggable = true
 
@@ -169,7 +194,7 @@ local function createDVUI()
     toggleButton.Parent = contentContainer
     toggleButton.BackgroundColor3 = autoDeliveryActive and Color3.fromRGB(80, 40, 120) or Color3.fromRGB(150, 40, 40)
     toggleButton.Position = UDim2.new(0.5, -100, 0, 45)
-    toggleButton.Size = UDim2.new(0, 200, 0, 40)
+    toggleButton.Size = UDim2.new(0, 200, 0, 35)
     toggleButton.Font = Enum.Font.GothamBold
     toggleButton.Text = autoDeliveryActive and "🔴 STOP DELIVERY" or "🟢 START DELIVERY"
     toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -179,10 +204,24 @@ local function createDVUI()
     toggleCorner.CornerRadius = UDim.new(0, 8)
     toggleCorner.Parent = toggleButton
 
+    manualTpButton = Instance.new("TextButton")
+    manualTpButton.Parent = contentContainer
+    manualTpButton.BackgroundColor3 = Color3.fromRGB(50, 30, 80)
+    manualTpButton.Position = UDim2.new(0.5, -100, 0, 88)
+    manualTpButton.Size = UDim2.new(0, 200, 0, 35)
+    manualTpButton.Font = Enum.Font.GothamBold
+    manualTpButton.Text = "📍 TP KE PANGKALAN"
+    manualTpButton.TextColor3 = Color3.fromRGB(200, 180, 255)
+    manualTpButton.TextSize = 12
+    manualTpButton.BorderSizePixel = 0
+    local manualCorner = Instance.new("UICorner")
+    manualCorner.CornerRadius = UDim.new(0, 8)
+    manualCorner.Parent = manualTpButton
+
     local infoText = Instance.new("TextLabel")
     infoText.Parent = contentContainer
     infoText.BackgroundTransparency = 1
-    infoText.Position = UDim2.new(0, 10, 0, 95)
+    infoText.Position = UDim2.new(0, 10, 0, 130)
     infoText.Size = UDim2.new(1, -20, 0, 20)
     infoText.Font = Enum.Font.Gotham
     infoText.Text = "⚡ Anti-Cheat Cooldown: 3s"
@@ -215,7 +254,7 @@ local function createDVUI()
     minimizeButton.MouseButton1Click:Connect(function()
         isMinimized = not isMinimized
         contentContainer.Visible = not isMinimized
-        mainFrame.Size = isMinimized and UDim2.new(0, 270, 0, 40) or UDim2.new(0, 270, 0, 170)
+        mainFrame.Size = isMinimized and UDim2.new(0, 270, 0, 40) or UDim2.new(0, 270, 0, 215)
         minimizeButton.Text = isMinimized and "⊕" or "−"
     end)
 
@@ -241,6 +280,13 @@ local function createDVUI()
                 statusText.TextColor3 = Color3.fromRGB(180, 160, 210)
             end
         end
+    end)
+
+    manualTpButton.MouseButton1Click:Connect(function()
+        teleportToPosition(Vector3.new(3121, 23, 17))
+        manualTpButton.Text = "✨ Teleported!"
+        task.wait(1)
+        manualTpButton.Text = "📍 TP KE PANGKALAN"
     end)
 end
 
@@ -334,4 +380,4 @@ task.spawn(function()
     end
 end)
 
-print("[DV EXPLOITS] Auto Delivery Final Loaded! 🚚🔥")
+print("[DV EXPLOITS] Auto Delivery with Manual TP Loaded! 🚚🔥")
