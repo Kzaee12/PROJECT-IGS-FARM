@@ -1,7 +1,12 @@
+--[[
+    DV EXPLOITS • SHOP PRO + PINK NEON UI + ADVANCED AUTO BUY PANEL
+]]
+
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 local LocalPlayer = Players.LocalPlayer
 local targetParent = (syn and CoreGui) or (gethui and gethui()) or LocalPlayer:WaitForChild("PlayerGui")
@@ -125,14 +130,8 @@ ItemConfig.Items = {
 	MobilHino={Category="Kendaraan",Tier=2,Patch=nil}
 }
 
-function ItemConfig.Get(name)
-	return ItemConfig.Items[name]
-end
-
-function ItemConfig.GetTierConfig(tier)
-	return ItemConfig.TierConfig[tier] or ItemConfig.TierConfig[1]
-end
-
+function ItemConfig.Get(name) return ItemConfig.Items[name] end
+function ItemConfig.GetTierConfig(tier) return ItemConfig.TierConfig[tier] or ItemConfig.TierConfig[1] end
 function ItemConfig.GetTier(name)
 	local d = ItemConfig.Get(name)
 	return d and d.Tier or 1
@@ -176,12 +175,8 @@ local ItemIcons = {
 }
 
 local function GetItemIcon(itemName)
-	if ItemIcons[itemName] then
-		return ItemIcons[itemName]
-	end
-
+	if ItemIcons[itemName] then return ItemIcons[itemName] end
 	local itemData = ItemConfig.Get(itemName)
-
 	if itemData then
 		local category = itemData.Category
 		if category == "Subwoffer" then return "🔊" end
@@ -191,7 +186,6 @@ local function GetItemIcon(itemName)
 		if category == "Rig" then return "🔧" end
 		if category == "Kendaraan" then return "🚗" end
 	end
-
 	return "📦"
 end
 
@@ -210,6 +204,7 @@ local DaftarToko = {
 
 local AllLoadedItems = {}
 local SelectedItems = {}
+local AutoBuyTasks = {}
 local currentTokoName = ""
 
 if targetParent:FindFirstChild("DVExploitsShopPro") then
@@ -217,14 +212,30 @@ if targetParent:FindFirstChild("DVExploitsShopPro") then
 end
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DV EXPLOITS SHOP"
+ScreenGui.Name = "DVExploitsShopPro"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = targetParent
+
+local function ApplyRainbow(uiObject, isBackground)
+	task.spawn(function()
+		local hue = math.random()
+		while uiObject and uiObject.Parent do
+			hue = (hue + 0.008) % 1
+			local col = Color3.fromHSV(hue, 0.9, 1)
+			if isBackground then
+				uiObject.BackgroundColor3 = col
+			else
+				uiObject.Color = col
+			end
+			task.wait(0.03)
+		end
+	end)
+end
 
 local LoadingFrame = Instance.new("Frame")
 LoadingFrame.Size = UDim2.new(0,360,0,320)
 LoadingFrame.Position = UDim2.new(0.5,-180,0.5,-160)
-LoadingFrame.BackgroundColor3 = Color3.fromRGB(10,7,15)
+LoadingFrame.BackgroundColor3 = Color3.fromRGB(12,10,18)
 LoadingFrame.BorderSizePixel = 0
 LoadingFrame.ZIndex = 100
 LoadingFrame.Parent = ScreenGui
@@ -232,28 +243,37 @@ LoadingFrame.Parent = ScreenGui
 Instance.new("UICorner",LoadingFrame).CornerRadius = UDim.new(0,8)
 
 local LoadingStroke = Instance.new("UIStroke")
-LoadingStroke.Color = Color3.fromRGB(160,32,240)
-LoadingStroke.Thickness = 2
+LoadingStroke.Thickness = 2.5
 LoadingStroke.Parent = LoadingFrame
+ApplyRainbow(LoadingStroke, false)
 
 local Brand = Instance.new("TextLabel")
 Brand.Size = UDim2.new(1,-30,0,35)
 Brand.Position = UDim2.new(0,15,0,30)
 Brand.BackgroundTransparency = 1
 Brand.Text = "DV EXPLOITS"
-Brand.TextColor3 = Color3.fromRGB(200,100,255)
+Brand.TextColor3 = Color3.fromRGB(255,255,255)
 Brand.TextSize = 21
 Brand.Font = Enum.Font.GothamBold
 Brand.TextXAlignment = Enum.TextXAlignment.Center
 Brand.ZIndex = 101
 Brand.Parent = LoadingFrame
 
+task.spawn(function()
+	local h = 0
+	while Brand.Parent do
+		h = (h + 0.01) % 1
+		Brand.TextColor3 = Color3.fromHSV(h, 0.8, 1)
+		task.wait(0.04)
+	end
+end)
+
 local SubBrand = Instance.new("TextLabel")
 SubBrand.Size = UDim2.new(1,-30,0,20)
 SubBrand.Position = UDim2.new(0,15,0,64)
 SubBrand.BackgroundTransparency = 1
-SubBrand.Text = "BUY SYSTEM"
-SubBrand.TextColor3 = Color3.fromRGB(150,120,180)
+SubBrand.Text = "BUY SYSTEM PRO"
+SubBrand.TextColor3 = Color3.fromRGB(200,200,200)
 SubBrand.TextSize = 9
 SubBrand.Font = Enum.Font.Code
 SubBrand.TextXAlignment = Enum.TextXAlignment.Center
@@ -267,26 +287,18 @@ Avatar.BackgroundColor3 = Color3.fromRGB(25,18,38)
 Avatar.BorderSizePixel = 0
 Avatar.ZIndex = 101
 Avatar.Parent = LoadingFrame
-
 Instance.new("UICorner",Avatar).CornerRadius = UDim.new(1,0)
 
 local AvatarStroke = Instance.new("UIStroke")
-AvatarStroke.Color = Color3.fromRGB(160,32,240)
 AvatarStroke.Thickness = 2
 AvatarStroke.Parent = Avatar
+ApplyRainbow(AvatarStroke, false)
 
 task.spawn(function()
 	local success,image = pcall(function()
-		return Players:GetUserThumbnailAsync(
-			LocalPlayer.UserId,
-			Enum.ThumbnailType.HeadShot,
-			Enum.ThumbnailSize.Size150x150
-		)
+		return Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size150x150)
 	end)
-
-	if success then
-		Avatar.Image = image
-	end
+	if success then Avatar.Image = image end
 end)
 
 local UserLabel = Instance.new("TextLabel")
@@ -294,31 +306,19 @@ UserLabel.Size = UDim2.new(1,-30,0,20)
 UserLabel.Position = UDim2.new(0,15,0,155)
 UserLabel.BackgroundTransparency = 1
 UserLabel.Text = "@"..LocalPlayer.Name
-UserLabel.TextColor3 = Color3.fromRGB(235,235,235)
+UserLabel.TextColor3 = Color3.fromRGB(255,255,255)
 UserLabel.TextSize = 11
 UserLabel.Font = Enum.Font.GothamBold
 UserLabel.TextXAlignment = Enum.TextXAlignment.Center
 UserLabel.ZIndex = 101
 UserLabel.Parent = LoadingFrame
 
-local DisplayLabel = Instance.new("TextLabel")
-DisplayLabel.Size = UDim2.new(1,-30,0,18)
-DisplayLabel.Position = UDim2.new(0,15,0,174)
-DisplayLabel.BackgroundTransparency = 1
-DisplayLabel.Text = LocalPlayer.DisplayName
-DisplayLabel.TextColor3 = Color3.fromRGB(145,145,145)
-DisplayLabel.TextSize = 9
-DisplayLabel.Font = Enum.Font.Code
-DisplayLabel.TextXAlignment = Enum.TextXAlignment.Center
-DisplayLabel.ZIndex = 101
-DisplayLabel.Parent = LoadingFrame
-
 local StatusLabel = Instance.new("TextLabel")
 StatusLabel.Size = UDim2.new(1,-30,0,20)
 StatusLabel.Position = UDim2.new(0,15,0,202)
 StatusLabel.BackgroundTransparency = 1
 StatusLabel.Text = "Initializing..."
-StatusLabel.TextColor3 = Color3.fromRGB(190,120,255)
+StatusLabel.TextColor3 = Color3.fromRGB(220,220,220)
 StatusLabel.TextSize = 9
 StatusLabel.Font = Enum.Font.Code
 StatusLabel.TextXAlignment = Enum.TextXAlignment.Center
@@ -332,46 +332,33 @@ ProgressBG.BackgroundColor3 = Color3.fromRGB(30,22,42)
 ProgressBG.BorderSizePixel = 0
 ProgressBG.ZIndex = 101
 ProgressBG.Parent = LoadingFrame
-
 Instance.new("UICorner",ProgressBG).CornerRadius = UDim.new(1,0)
 
 local Progress = Instance.new("Frame")
 Progress.Size = UDim2.new(0,0,1,0)
-Progress.BackgroundColor3 = Color3.fromRGB(160,32,240)
+Progress.BackgroundColor3 = Color3.fromRGB(255,255,255)
 Progress.BorderSizePixel = 0
 Progress.ZIndex = 102
 Progress.Parent = ProgressBG
-
 Instance.new("UICorner",Progress).CornerRadius = UDim.new(1,0)
+ApplyRainbow(Progress, true)
 
 local PercentLabel = Instance.new("TextLabel")
 PercentLabel.Size = UDim2.new(1,-30,0,18)
 PercentLabel.Position = UDim2.new(0,15,0,244)
 PercentLabel.BackgroundTransparency = 1
 PercentLabel.Text = "0%"
-PercentLabel.TextColor3 = Color3.fromRGB(120,120,120)
+PercentLabel.TextColor3 = Color3.fromRGB(180,180,180)
 PercentLabel.TextSize = 8
 PercentLabel.Font = Enum.Font.Code
 PercentLabel.TextXAlignment = Enum.TextXAlignment.Center
 PercentLabel.ZIndex = 101
 PercentLabel.Parent = LoadingFrame
 
-local LoadingFooter = Instance.new("TextLabel")
-LoadingFooter.Size = UDim2.new(1,-30,0,18)
-LoadingFooter.Position = UDim2.new(0,15,1,-28)
-LoadingFooter.BackgroundTransparency = 1
-LoadingFooter.Text = "DV EXPLOITS • PRIVATE SYSTEM"
-LoadingFooter.TextColor3 = Color3.fromRGB(75,65,90)
-LoadingFooter.TextSize = 7
-LoadingFooter.Font = Enum.Font.Code
-LoadingFooter.TextXAlignment = Enum.TextXAlignment.Center
-LoadingFooter.ZIndex = 101
-LoadingFooter.Parent = LoadingFrame
-
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0,360,0,330)
-MainFrame.Position = UDim2.new(0.5,-180,0.5,-165)
-MainFrame.BackgroundColor3 = Color3.fromRGB(15,12,22)
+MainFrame.Size = UDim2.new(0,360,0,430)
+MainFrame.Position = UDim2.new(0.5,-180,0.5,-215)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20,14,22)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = true
@@ -380,25 +367,24 @@ MainFrame.Parent = ScreenGui
 
 Instance.new("UICorner",MainFrame).CornerRadius = UDim.new(0,8)
 
-local Stroke = Instance.new("UIStroke")
-Stroke.Color = Color3.fromRGB(160,32,240)
-Stroke.Thickness = 2
-Stroke.Parent = MainFrame
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(255,105,180)
+MainStroke.Thickness = 2
+MainStroke.Parent = MainFrame
 
 local TopBar = Instance.new("Frame")
 TopBar.Size = UDim2.new(1,0,0,32)
-TopBar.BackgroundColor3 = Color3.fromRGB(22,17,32)
+TopBar.BackgroundColor3 = Color3.fromRGB(30,18,34)
 TopBar.BorderSizePixel = 0
 TopBar.Parent = MainFrame
-
 Instance.new("UICorner",TopBar).CornerRadius = UDim.new(0,8)
 
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Size = UDim2.new(0,250,1,0)
+TitleLabel.Size = UDim2.new(0,160,1,0)
 TitleLabel.Position = UDim2.new(0,10,0,0)
 TitleLabel.BackgroundTransparency = 1
-TitleLabel.Text = "DV EXPLOITS | BUY SYSTEM"
-TitleLabel.TextColor3 = Color3.fromRGB(200,100,255)
+TitleLabel.Text = "DV EXPLOITS | SHOP"
+TitleLabel.TextColor3 = Color3.fromRGB(255,140,200)
 TitleLabel.TextSize = 9
 TitleLabel.Font = Enum.Font.Code
 TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -407,26 +393,46 @@ TitleLabel.Parent = TopBar
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Size = UDim2.new(0,21,0,21)
 CloseBtn.Position = UDim2.new(1,-27,0.5,-10)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(40,25,45)
-CloseBtn.TextColor3 = Color3.fromRGB(255,80,120)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(50,25,45)
+CloseBtn.TextColor3 = Color3.fromRGB(255,100,150)
 CloseBtn.Text = "X"
 CloseBtn.TextSize = 9
 CloseBtn.Font = Enum.Font.Code
 CloseBtn.Parent = TopBar
-
 Instance.new("UICorner",CloseBtn).CornerRadius = UDim.new(0,4)
 
 local MinimizeBtn = Instance.new("TextButton")
 MinimizeBtn.Size = UDim2.new(0,21,0,21)
 MinimizeBtn.Position = UDim2.new(1,-52,0.5,-10)
-MinimizeBtn.BackgroundColor3 = Color3.fromRGB(40,25,45)
-MinimizeBtn.TextColor3 = Color3.fromRGB(200,150,255)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(50,25,45)
+MinimizeBtn.TextColor3 = Color3.fromRGB(255,255,255)
 MinimizeBtn.Text = "-"
 MinimizeBtn.TextSize = 10
 MinimizeBtn.Font = Enum.Font.Code
 MinimizeBtn.Parent = TopBar
-
 Instance.new("UICorner",MinimizeBtn).CornerRadius = UDim.new(0,4)
+
+local TabShopBtn = Instance.new("TextButton")
+TabShopBtn.Size = UDim2.new(0,55,0,18)
+TabShopBtn.Position = UDim2.new(1,-112,0.5,-9)
+TabShopBtn.BackgroundColor3 = Color3.fromRGB(255,105,180)
+TabShopBtn.TextColor3 = Color3.fromRGB(255,255,255)
+TabShopBtn.Text = "Shop"
+TabShopBtn.TextSize = 8
+TabShopBtn.Font = Enum.Font.Code
+TabShopBtn.Parent = TopBar
+Instance.new("UICorner",TabShopBtn).CornerRadius = UDim.new(0,4)
+
+local TabAutoBtn = Instance.new("TextButton")
+TabAutoBtn.Size = UDim2.new(0,55,0,18)
+TabAutoBtn.Position = UDim2.new(1,-172,0.5,-9)
+TabAutoBtn.BackgroundColor3 = Color3.fromRGB(40,22,42)
+TabAutoBtn.TextColor3 = Color3.fromRGB(200,150,220)
+TabAutoBtn.Text = "Auto-Buy"
+TabAutoBtn.TextSize = 8
+TabAutoBtn.Font = Enum.Font.Code
+TabAutoBtn.Parent = TopBar
+Instance.new("UICorner",TabAutoBtn).CornerRadius = UDim.new(0,4)
 
 local Container = Instance.new("Frame")
 Container.Size = UDim2.new(1,0,1,-32)
@@ -434,16 +440,59 @@ Container.Position = UDim2.new(0,0,0,32)
 Container.BackgroundTransparency = 1
 Container.Parent = MainFrame
 
-local isMinimized = false
+local ShopView = Instance.new("Frame")
+ShopView.Size = UDim2.new(1,0,1,0)
+ShopView.BackgroundTransparency = 1
+ShopView.Visible = true
+ShopView.Parent = Container
 
+local AutoViewContainer = Instance.new("Frame")
+AutoViewContainer.Size = UDim2.new(1,0,1,0)
+AutoViewContainer.BackgroundTransparency = 1
+AutoViewContainer.Visible = false
+AutoViewContainer.Parent = Container
+
+local StartAllBtn = Instance.new("TextButton")
+StartAllBtn.Size = UDim2.new(1,-20,0,26)
+StartAllBtn.Position = UDim2.new(0,10,0,7)
+StartAllBtn.BackgroundColor3 = Color3.fromRGB(50,180,100)
+StartAllBtn.TextColor3 = Color3.fromRGB(255,255,255)
+StartAllBtn.Text = "▶ START ALL AUTO-BUY"
+StartAllBtn.TextSize = 9
+StartAllBtn.Font = Enum.Font.Code
+StartAllBtn.Parent = AutoViewContainer
+Instance.new("UICorner",StartAllBtn).CornerRadius = UDim.new(0,5)
+
+local AutoView = Instance.new("ScrollingFrame")
+AutoView.Size = UDim2.new(1,-20,1,-45)
+AutoView.Position = UDim2.new(0,10,0,38)
+AutoView.BackgroundTransparency = 1
+AutoView.BorderSizePixel = 0
+AutoView.ScrollBarThickness = 3
+AutoView.Parent = AutoViewContainer
+
+local AutoLayout = Instance.new("UIListLayout")
+AutoLayout.SortOrder = Enum.SortOrder.LayoutOrder
+AutoLayout.Padding = UDim.new(0,6)
+AutoLayout.Parent = AutoView
+
+local EmptyHintLabel = Instance.new("TextLabel")
+EmptyHintLabel.Size = UDim2.new(1,0,0,60)
+EmptyHintLabel.Position = UDim2.new(0,0,0,40)
+EmptyHintLabel.BackgroundTransparency = 1
+EmptyHintLabel.TextColor3 = Color3.fromRGB(150,120,150)
+EmptyHintLabel.Text = "* CENTANG ITEM YANG MAU DI BELI DI SHOP DULU *"
+EmptyHintLabel.TextSize = 9
+EmptyHintLabel.Font = Enum.Font.Code
+EmptyHintLabel.TextWrapped = true
+EmptyHintLabel.TextXAlignment = Enum.TextXAlignment.Center
+EmptyHintLabel.Parent = AutoView
+
+local isMinimized = false
 MinimizeBtn.MouseButton1Click:Connect(function()
 	isMinimized = not isMinimized
 	Container.Visible = not isMinimized
-
-	MainFrame.Size = isMinimized
-		and UDim2.new(0,360,0,32)
-		or UDim2.new(0,360,0,330)
-
+	MainFrame.Size = isMinimized and UDim2.new(0,360,0,32) or UDim2.new(0,360,0,430)
 	MinimizeBtn.Text = isMinimized and "+" or "-"
 end)
 
@@ -451,54 +500,71 @@ CloseBtn.MouseButton1Click:Connect(function()
 	ScreenGui:Destroy()
 end)
 
+TabShopBtn.MouseButton1Click:Connect(function()
+	ShopView.Visible = true
+	AutoViewContainer.Visible = false
+	TabShopBtn.BackgroundColor3 = Color3.fromRGB(255,105,180)
+	TabShopBtn.TextColor3 = Color3.fromRGB(255,255,255)
+	TabAutoBtn.BackgroundColor3 = Color3.fromRGB(40,22,42)
+	TabAutoBtn.TextColor3 = Color3.fromRGB(200,150,220)
+end)
+
+TabAutoBtn.MouseButton1Click:Connect(function()
+	ShopView.Visible = false
+	AutoViewContainer.Visible = true
+	TabAutoBtn.BackgroundColor3 = Color3.fromRGB(255,105,180)
+	TabAutoBtn.TextColor3 = Color3.fromRGB(255,255,255)
+	TabShopBtn.BackgroundColor3 = Color3.fromRGB(40,22,42)
+	TabShopBtn.TextColor3 = Color3.fromRGB(200,150,220)
+end)
+
 local DropdownBtn = Instance.new("TextButton")
-DropdownBtn.Size = UDim2.new(1,-20,0,25)
+DropdownBtn.Size = UDim2.new(1,-20,0,26)
 DropdownBtn.Position = UDim2.new(0,10,0,7)
-DropdownBtn.BackgroundColor3 = Color3.fromRGB(25,18,38)
-DropdownBtn.TextColor3 = Color3.fromRGB(200,100,255)
+DropdownBtn.BackgroundColor3 = Color3.fromRGB(32,18,30)
+DropdownBtn.TextColor3 = Color3.fromRGB(255,255,255)
 DropdownBtn.Text = "🏪 Pilih Toko ▾"
 DropdownBtn.TextSize = 9
 DropdownBtn.Font = Enum.Font.Code
-DropdownBtn.Parent = Container
-
+DropdownBtn.Parent = ShopView
 Instance.new("UICorner",DropdownBtn).CornerRadius = UDim.new(0,5)
+local DropdownStroke = Instance.new("UIStroke")
+DropdownStroke.Color = Color3.fromRGB(255,105,180)
+DropdownStroke.Thickness = 1.2
+DropdownStroke.Parent = DropdownBtn
 
 local SearchBox = Instance.new("TextBox")
 SearchBox.Size = UDim2.new(1,-20,0,24)
-SearchBox.Position = UDim2.new(0,10,0,37)
-SearchBox.BackgroundColor3 = Color3.fromRGB(20,14,30)
+SearchBox.Position = UDim2.new(0,10,0,38)
+SearchBox.BackgroundColor3 = Color3.fromRGB(26,14,24)
 SearchBox.TextColor3 = Color3.fromRGB(255,255,255)
 SearchBox.PlaceholderText = "🔍 Search item..."
 SearchBox.Text = ""
 SearchBox.TextSize = 9
 SearchBox.Font = Enum.Font.Code
-SearchBox.Parent = Container
-
+SearchBox.Parent = ShopView
 Instance.new("UICorner",SearchBox).CornerRadius = UDim.new(0,5)
 
 local DropdownList = Instance.new("ScrollingFrame")
 DropdownList.Size = UDim2.new(1,-20,0,0)
-DropdownList.Position = UDim2.new(0,10,0,34)
-DropdownList.BackgroundColor3 = Color3.fromRGB(20,14,30)
+DropdownList.Position = UDim2.new(0,10,0,35)
+DropdownList.BackgroundColor3 = Color3.fromRGB(26,14,24)
 DropdownList.BorderSizePixel = 0
 DropdownList.Visible = false
-DropdownList.ZIndex = 10
-DropdownList.Parent = Container
-
+DropdownList.ZIndex = 15
+DropdownList.Parent = ShopView
 Instance.new("UICorner",DropdownList).CornerRadius = UDim.new(0,5)
-
 local DdLayout = Instance.new("UIListLayout")
 DdLayout.SortOrder = Enum.SortOrder.LayoutOrder
 DdLayout.Parent = DropdownList
 
 local ScrollingFrame = Instance.new("ScrollingFrame")
-ScrollingFrame.Size = UDim2.new(1,-20,1,-128)
+ScrollingFrame.Size = UDim2.new(1,-20,1,-130)
 ScrollingFrame.Position = UDim2.new(0,10,0,68)
-ScrollingFrame.BackgroundColor3 = Color3.fromRGB(12,9,18)
+ScrollingFrame.BackgroundColor3 = Color3.fromRGB(15,10,16)
 ScrollingFrame.BorderSizePixel = 0
 ScrollingFrame.ScrollBarThickness = 3
-ScrollingFrame.Parent = Container
-
+ScrollingFrame.Parent = ShopView
 Instance.new("UICorner",ScrollingFrame).CornerRadius = UDim.new(0,5)
 
 local UIListLayout = Instance.new("UIListLayout")
@@ -509,24 +575,21 @@ UIListLayout.Parent = ScrollingFrame
 local BuySelectedBtn = Instance.new("TextButton")
 BuySelectedBtn.Size = UDim2.new(1,-20,0,30)
 BuySelectedBtn.Position = UDim2.new(0,10,1,-37)
-BuySelectedBtn.BackgroundColor3 = Color3.fromRGB(150,30,230)
+BuySelectedBtn.BackgroundColor3 = Color3.fromRGB(255,105,180)
 BuySelectedBtn.TextColor3 = Color3.fromRGB(255,255,255)
 BuySelectedBtn.Text = "⚡ BUY ITEM CHOSE"
 BuySelectedBtn.TextSize = 9
 BuySelectedBtn.Font = Enum.Font.Code
-BuySelectedBtn.Parent = Container
-
+BuySelectedBtn.Parent = ShopView
 Instance.new("UICorner",BuySelectedBtn).CornerRadius = UDim.new(0,5)
 
 local function formatRupiah(amount)
 	local formatted = tostring(amount)
 	local k = ""
-
 	while #formatted > 3 do
 		k = "."..string.sub(formatted,-3)..k
 		formatted = string.sub(formatted,1,#formatted-3)
 	end
-
 	return formatted..k
 end
 
@@ -535,42 +598,195 @@ local function ShowNotif(text,isError)
 		local Notif = Instance.new("TextLabel")
 		Notif.Size = UDim2.new(0,250,0,34)
 		Notif.Position = UDim2.new(1,-260,1,-50)
-		Notif.BackgroundColor3 = Color3.fromRGB(20,12,32)
-		Notif.TextColor3 = isError
-			and Color3.fromRGB(255,100,100)
-			or Color3.fromRGB(210,120,255)
+		Notif.BackgroundColor3 = Color3.fromRGB(30,16,28)
+		Notif.TextColor3 = isError and Color3.fromRGB(255,100,100) or Color3.fromRGB(255,255,255)
 		Notif.Text = text
 		Notif.TextSize = 9
 		Notif.Font = Enum.Font.Code
 		Notif.TextWrapped = true
+		Notif.ZIndex = 50
 		Notif.Parent = ScreenGui
-
 		Instance.new("UICorner",Notif).CornerRadius = UDim.new(0,6)
+		local NotifStroke = Instance.new("UIStroke")
+		NotifStroke.Color = Color3.fromRGB(255,105,180)
+		NotifStroke.Thickness = 1.2
+		NotifStroke.Parent = Notif
 
 		task.wait(2.5)
-
-		TweenService:Create(
-			Notif,
-			TweenInfo.new(0.5),
-			{
-				TextTransparency=1,
-				BackgroundTransparency=1
-			}
-		):Play()
-
+		TweenService:Create(Notif, TweenInfo.new(0.5), {TextTransparency=1, BackgroundTransparency=1}):Play()
 		task.wait(0.5)
-
-		if Notif then
-			Notif:Destroy()
-		end
+		if Notif then Notif:Destroy() end
 	end)
 end
 
+local function RunAutoBuyTask(itemName, data)
+	if not AutoBuyTasks[itemName] then
+		AutoBuyTasks[itemName] = task.spawn(function()
+			while data.isAutoBuying do
+				local targetQty = data.autoQty or 1
+				local intervalSec = (data.autoMinutes or 1) * 60
+				
+				local success, serverItems = pcall(function()
+					return GetShopItems:InvokeServer(currentTokoName, "Semua")
+				end)
+				
+				local hasStock = false
+				if success and type(serverItems) == "table" then
+					for _, sItem in pairs(serverItems) do
+						local sName = sItem.Name or sItem[1]
+						if sName == itemName then
+							local sStock = tonumber(sItem.Stock or sItem.Stok or sItem.Quantity) or 999
+							if sStock >= targetQty then
+								hasStock = true
+							end
+							break
+						end
+					end
+				end
+				
+				if hasStock then
+					local pSuccess, pMsg = pcall(function()
+						return PurchaseEvent:InvokeServer(itemName, targetQty)
+					end)
+					if pSuccess and pMsg ~= false then
+						ShowNotif("[AUTO] Sukses Beli " .. targetQty .. "x " .. itemName)
+					else
+						ShowNotif("[AUTO] Gagal beli " .. itemName, true)
+					end
+					local elapsed = 0
+					while elapsed < intervalSec and data.isAutoBuying do
+						task.wait(1)
+						elapsed += 1
+					end
+				else
+					ShowNotif("[AUTO] Stok " .. itemName .. " kosong...", true)
+					task.wait(5)
+				end
+			end
+			AutoBuyTasks[itemName] = nil
+		end)
+	end
+end
+
+local function RefreshAutoBuyUI()
+	for _,c in ipairs(AutoView:GetChildren()) do
+		if c:IsA("Frame") then c:Destroy() end
+	end
+	
+	local count = 0
+	for itemName, data in pairs(SelectedItems) do
+		if data.Selected then
+			count += 1
+			local row = Instance.new("Frame")
+			row.Size = UDim2.new(1,-8,0,65)
+			row.BackgroundColor3 = Color3.fromRGB(26,16,24)
+			row.Parent = AutoView
+			Instance.new("UICorner",row).CornerRadius = UDim.new(0,5)
+			
+			local label = Instance.new("TextLabel")
+			label.Size = UDim2.new(1,-10,0,22)
+			label.Position = UDim2.new(0,8,0,4)
+			label.BackgroundTransparency = 1
+			label.Text = "📦 " .. data.displayName .. " [" .. (data.isAutoBuying and "ACTIVE 🟢" or "OFF 🔴") .. "]"
+			label.TextColor3 = Color3.fromRGB(255,180,220)
+			label.TextSize = 9
+			label.Font = Enum.Font.Code
+			label.TextXAlignment = Enum.TextXAlignment.Left
+			label.Parent = row
+			
+			local qtyInput = Instance.new("TextBox")
+			qtyInput.Size = UDim2.new(0,85,0,22)
+			qtyInput.Position = UDim2.new(0,8,0,32)
+			qtyInput.BackgroundColor3 = Color3.fromRGB(35,20,32)
+			qtyInput.TextColor3 = Color3.fromRGB(255,255,255)
+			qtyInput.PlaceholderText = "Qty"
+			qtyInput.Text = tostring(data.autoQty or 1)
+			qtyInput.TextSize = 8
+			qtyInput.Font = Enum.Font.Code
+			qtyInput.Parent = row
+			Instance.new("UICorner",qtyInput).CornerRadius = UDim.new(0,4)
+			
+			qtyInput:GetPropertyChangedSignal("Text"):Connect(function()
+				data.autoQty = tonumber(qtyInput.Text) or 1
+			end)
+			
+			local minInput = Instance.new("TextBox")
+			minInput.Size = UDim2.new(0,85,0,22)
+			minInput.Position = UDim2.new(0,100,0,32)
+			minInput.BackgroundColor3 = Color3.fromRGB(35,20,32)
+			minInput.TextColor3 = Color3.fromRGB(255,255,255)
+			minInput.PlaceholderText = "Menit"
+			minInput.Text = tostring(data.autoMinutes or 1)
+			minInput.TextSize = 8
+			minInput.Font = Enum.Font.Code
+			minInput.Parent = row
+			Instance.new("UICorner",minInput).CornerRadius = UDim.new(0,4)
+			
+			minInput:GetPropertyChangedSignal("Text"):Connect(function()
+				data.autoMinutes = tonumber(minInput.Text) or 1
+			end)
+			
+			local toggleBtn = Instance.new("TextButton")
+			toggleBtn.Size = UDim2.new(0,110,0,22)
+			toggleBtn.Position = UDim2.new(1,-118,0,32)
+			toggleBtn.BackgroundColor3 = data.isAutoBuying and Color3.fromRGB(50,180,100) or Color3.fromRGB(180,50,90)
+			toggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
+			toggleBtn.Text = data.isAutoBuying and "STOP AUTO" or "START AUTO"
+			toggleBtn.TextSize = 8
+			toggleBtn.Font = Enum.Font.Code
+			toggleBtn.Parent = row
+			Instance.new("UICorner",toggleBtn).CornerRadius = UDim.new(0,4)
+			
+			toggleBtn.MouseButton1Click:Connect(function()
+				data.isAutoBuying = not data.isAutoBuying
+				toggleBtn.BackgroundColor3 = data.isAutoBuying and Color3.fromRGB(50,180,100) or Color3.fromRGB(180,50,90)
+				toggleBtn.Text = data.isAutoBuying and "STOP AUTO" or "START AUTO"
+				label.Text = "📦 " .. data.displayName .. " [" .. (data.isAutoBuying and "ACTIVE 🟢" or "OFF 🔴") .. "]"
+				
+				if data.isAutoBuying then
+					RunAutoBuyTask(itemName, data)
+				end
+			end)
+		end
+	end
+	
+	if count > 0 then
+		EmptyHintLabel.Visible = false
+		AutoView.CanvasSize = UDim2.new(0,0,0, count * 71)
+	else
+		EmptyHintLabel.Visible = true
+		AutoView.CanvasSize = UDim2.new(0,0,0,0)
+	end
+end
+
+StartAllBtn.MouseButton1Click:Connect(function()
+	local anyActive = false
+	for _, data in pairs(SelectedItems) do
+		if data.Selected and data.isAutoBuying then
+			anyActive = true
+			break
+		end
+	end
+	
+	local targetState = not anyActive
+	for itemName, data in pairs(SelectedItems) do
+		if data.Selected then
+			data.isAutoBuying = targetState
+			if targetState then
+				RunAutoBuyTask(itemName, data)
+			end
+		end
+	end
+	
+	StartAllBtn.BackgroundColor3 = targetState and Color3.fromRGB(180,50,90) or Color3.fromRGB(50,180,100)
+	StartAllBtn.Text = targetState and "⏹ STOP ALL AUTO-BUY" or "▶ START ALL AUTO-BUY"
+	RefreshAutoBuyUI()
+	ShowNotif(targetState and "Semua Auto-Buy Dinyalakan" or "Semua Auto-Buy Dimatikan")
+end)
+
 local function RenderItems(searchQuery)
 	for _,child in ipairs(ScrollingFrame:GetChildren()) do
-		if child:IsA("Frame") then
-			child:Destroy()
-		end
+		if child:IsA("Frame") then child:Destroy() end
 	end
 
 	searchQuery = string.lower(searchQuery or "")
@@ -582,10 +798,7 @@ local function RenderItems(searchQuery)
 		local stock = item.stock
 		local icon = item.icon
 
-		if searchQuery == ""
-			or string.find(string.lower(displayName),searchQuery)
-			or string.find(string.lower(itemName),searchQuery) then
-
+		if searchQuery == "" or string.find(string.lower(displayName),searchQuery) or string.find(string.lower(itemName),searchQuery) then
 			local tierLevel = ItemConfig.GetTier(itemName)
 			local tierData = ItemConfig.GetTierConfig(tierLevel)
 			local tierName = tierData.Name
@@ -593,9 +806,8 @@ local function RenderItems(searchQuery)
 
 			local Row = Instance.new("Frame")
 			Row.Size = UDim2.new(1,-8,0,42)
-			Row.BackgroundColor3 = Color3.fromRGB(22,16,32)
+			Row.BackgroundColor3 = Color3.fromRGB(26,16,24)
 			Row.Parent = ScrollingFrame
-
 			Instance.new("UICorner",Row).CornerRadius = UDim.new(0,5)
 
 			local RowStroke = Instance.new("UIStroke")
@@ -605,33 +817,17 @@ local function RenderItems(searchQuery)
 			RowStroke.Parent = Row
 
 			Row.MouseEnter:Connect(function()
-				TweenService:Create(
-					RowStroke,
-					TweenInfo.new(0.2),
-					{
-						Thickness=1.5,
-						Transparency=0.5
-					}
-				):Play()
+				TweenService:Create(RowStroke, TweenInfo.new(0.2), {Thickness=1.5, Transparency=0.3}):Play()
 			end)
-
 			Row.MouseLeave:Connect(function()
-				TweenService:Create(
-					RowStroke,
-					TweenInfo.new(0.2),
-					{
-						Thickness=0,
-						Transparency=1
-					}
-				):Play()
+				TweenService:Create(RowStroke, TweenInfo.new(0.2), {Thickness=0, Transparency=1}):Play()
 			end)
 
 			local IconHolder = Instance.new("Frame")
 			IconHolder.Size = UDim2.new(0,32,0,32)
 			IconHolder.Position = UDim2.new(0,4,0.5,-16)
-			IconHolder.BackgroundColor3 = Color3.fromRGB(12,8,18)
+			IconHolder.BackgroundColor3 = Color3.fromRGB(18,10,16)
 			IconHolder.Parent = Row
-
 			Instance.new("UICorner",IconHolder).CornerRadius = UDim.new(0,5)
 
 			local IconStroke = Instance.new("UIStroke")
@@ -653,21 +849,12 @@ local function RenderItems(searchQuery)
 			local CheckBox = Instance.new("TextButton")
 			CheckBox.Size = UDim2.new(0,19,0,19)
 			CheckBox.Position = UDim2.new(0,41,0.5,-9)
-			CheckBox.BackgroundColor3 =
-				SelectedItems[itemName]
-				and SelectedItems[itemName].Selected
-				and Color3.fromRGB(160,32,240)
-				or Color3.fromRGB(35,25,48)
+			CheckBox.BackgroundColor3 = (SelectedItems[itemName] and SelectedItems[itemName].Selected) and Color3.fromRGB(255,105,180) or Color3.fromRGB(38,22,34)
 			CheckBox.TextColor3 = Color3.fromRGB(255,255,255)
-			CheckBox.Text =
-				SelectedItems[itemName]
-				and SelectedItems[itemName].Selected
-				and "✓"
-				or ""
+			CheckBox.Text = (SelectedItems[itemName] and SelectedItems[itemName].Selected) and "✓" or ""
 			CheckBox.TextSize = 10
 			CheckBox.Font = Enum.Font.Code
 			CheckBox.Parent = Row
-
 			Instance.new("UICorner",CheckBox).CornerRadius = UDim.new(0,4)
 
 			local InfoLabel = Instance.new("TextLabel")
@@ -679,39 +866,31 @@ local function RenderItems(searchQuery)
 			InfoLabel.TextColor3 = Color3.fromRGB(230,230,230)
 			InfoLabel.TextSize = 8
 			InfoLabel.Font = Enum.Font.Code
-
-			InfoLabel.Text = string.format(
-				"%s [%s]\nRp%s | Stok: %s",
-				tostring(displayName),
-				tierName,
-				formatRupiah(price),
-				tostring(stock)
-			)
-
+			InfoLabel.Text = string.format("%s [%s]\nRp%s | Stok: %s", tostring(displayName), tierName, formatRupiah(price), tostring(stock))
 			InfoLabel.Parent = Row
 
 			local QtyBox = Instance.new("TextBox")
 			QtyBox.Size = UDim2.new(0,52,0,22)
 			QtyBox.Position = UDim2.new(1,-58,0.5,-11)
-			QtyBox.BackgroundColor3 = Color3.fromRGB(25,18,38)
-			QtyBox.TextColor3 = Color3.fromRGB(200,100,255)
+			QtyBox.BackgroundColor3 = Color3.fromRGB(32,18,30)
+			QtyBox.TextColor3 = Color3.fromRGB(255,255,255)
 			QtyBox.PlaceholderText = "Qty"
-			QtyBox.Text =
-				SelectedItems[itemName]
-				and SelectedItems[itemName].QtyBox.Text
-				or "1"
+			QtyBox.Text = SelectedItems[itemName] and tostring(SelectedItems[itemName].autoQty) or "1"
 			QtyBox.TextSize = 9
 			QtyBox.Font = Enum.Font.Code
 			QtyBox.Parent = Row
-
 			Instance.new("UICorner",QtyBox).CornerRadius = UDim.new(0,4)
 
 			if not SelectedItems[itemName] then
 				SelectedItems[itemName] = {
-					Selected=false,
-					QtyBox=QtyBox,
-					Stock=stock,
-					BasePrice=price
+					Selected = false,
+					QtyBox = QtyBox,
+					Stock = stock,
+					BasePrice = price,
+					displayName = displayName,
+					autoQty = 1,
+					autoMinutes = 1,
+					isAutoBuying = false
 				}
 			else
 				SelectedItems[itemName].QtyBox = QtyBox
@@ -720,54 +899,33 @@ local function RenderItems(searchQuery)
 			CheckBox.MouseButton1Click:Connect(function()
 				local ref = SelectedItems[itemName]
 				ref.Selected = not ref.Selected
-
-				CheckBox.BackgroundColor3 =
-					ref.Selected
-					and Color3.fromRGB(160,32,240)
-					or Color3.fromRGB(35,25,48)
-
+				CheckBox.BackgroundColor3 = ref.Selected and Color3.fromRGB(255,105,180) or Color3.fromRGB(38,22,34)
 				CheckBox.Text = ref.Selected and "✓" or ""
+				RefreshAutoBuyUI()
 			end)
 
 			QtyBox:GetPropertyChangedSignal("Text"):Connect(function()
 				local qty = tonumber(QtyBox.Text) or 1
-
-				if qty < 1 then
-					qty = 1
-				end
-
+				if qty < 1 then qty = 1 end
+				SelectedItems[itemName].autoQty = qty
 				local totalCost = price * qty
-
-				InfoLabel.Text = string.format(
-					"%s [%s]\nRp%s | %dx | Stok: %s",
-					tostring(displayName),
-					tierName,
-					formatRupiah(totalCost),
-					qty,
-					tostring(stock)
-				)
+				InfoLabel.Text = string.format("%s [%s]\nRp%s | %dx | Stok: %s", tostring(displayName), tierName, formatRupiah(totalCost), qty, tostring(stock))
 			end)
 		end
 	end
 
 	local totalHeight = 0
-
 	for _,child in ipairs(ScrollingFrame:GetChildren()) do
-		if child:IsA("Frame") then
-			totalHeight += child.AbsoluteSize.Y + 4
-		end
+		if child:IsA("Frame") then totalHeight += child.AbsoluteSize.Y + 4 end
 	end
-
 	ScrollingFrame.CanvasSize = UDim2.new(0,0,0,totalHeight)
 end
 
 local function LoadShop(tokoName)
 	currentTokoName = tokoName
-
 	local logo = ShopLogos[tokoName] or "🏪"
 	DropdownBtn.Text = logo.." "..tokoName.." ▾"
 
-	SelectedItems = {}
 	AllLoadedItems = {}
 
 	local success,serverItems = pcall(function()
@@ -780,30 +938,10 @@ local function LoadShop(tokoName)
 	end
 
 	for _,itemData in pairs(serverItems) do
-		local itemName =
-			itemData.Name
-			or itemData[1]
-			or "Unknown"
-
-		local price =
-			tonumber(
-				itemData.Price
-				or itemData.Harga
-			)
-			or 0
-
-		local stock =
-			tonumber(
-				itemData.Stock
-				or itemData.Stok
-				or itemData.Quantity
-			)
-			or 999
-
-		local displayName =
-			itemData.DisplayName
-			or itemData.Nama
-			or itemName
+		local itemName = itemData.Name or itemData[1] or "Unknown"
+		local price = tonumber(itemData.Price or itemData.Harga) or 0
+		local stock = tonumber(itemData.Stock or itemData.Stok or itemData.Quantity) or 999
+		local displayName = itemData.DisplayName or itemData.Nama or itemName
 
 		table.insert(AllLoadedItems,{
 			itemName=itemName,
@@ -822,60 +960,43 @@ SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
 end)
 
 local isDropdownOpen = false
-
 local function SetupDropdown(tokoList)
 	for _,child in ipairs(DropdownList:GetChildren()) do
-		if child:IsA("TextButton") then
-			child:Destroy()
-		end
+		if child:IsA("TextButton") then child:Destroy() end
 	end
 
 	for _,tokoName in ipairs(tokoList) do
 		local TokoBtn = Instance.new("TextButton")
-
 		TokoBtn.Size = UDim2.new(1,0,0,24)
-		TokoBtn.BackgroundColor3 = Color3.fromRGB(22,16,32)
-		TokoBtn.TextColor3 = Color3.fromRGB(200,150,255)
-
+		TokoBtn.BackgroundColor3 = Color3.fromRGB(26,14,24)
+		TokoBtn.TextColor3 = Color3.fromRGB(220,220,220)
 		local logo = ShopLogos[tokoName] or "🏪"
-
 		TokoBtn.Text = " "..logo.." "..tostring(tokoName)
 		TokoBtn.TextSize = 9
 		TokoBtn.Font = Enum.Font.Code
 		TokoBtn.TextXAlignment = Enum.TextXAlignment.Left
-		TokoBtn.ZIndex = 11
+		TokoBtn.ZIndex = 16
 		TokoBtn.Parent = DropdownList
 
 		TokoBtn.MouseButton1Click:Connect(function()
 			isDropdownOpen = false
 			DropdownList.Visible = false
 			DropdownList.Size = UDim2.new(1,-20,0,0)
-
 			LoadShop(tokoName)
-			ShowNotif(" Change Toko: "..tokoName)
+			ShowNotif("Change Toko: "..tokoName)
 		end)
 	end
 end
 
 DropdownBtn.MouseButton1Click:Connect(function()
 	isDropdownOpen = not isDropdownOpen
-
 	DropdownList.Visible = isDropdownOpen
-
-	DropdownList.Size =
-		isDropdownOpen
-		and UDim2.new(1,-20,0,125)
-		or UDim2.new(1,-20,0,0)
-
+	DropdownList.Size = isDropdownOpen and UDim2.new(1,-20,0,125) or UDim2.new(1,-20,0,0)
 	if isDropdownOpen then
 		local totalH = 0
-
 		for _,c in ipairs(DropdownList:GetChildren()) do
-			if c:IsA("TextButton") then
-				totalH += 24
-			end
+			if c:IsA("TextButton") then totalH += 24 end
 		end
-
 		DropdownList.CanvasSize = UDim2.new(0,0,0,totalH)
 	end
 end)
@@ -887,51 +1008,24 @@ BuySelectedBtn.MouseButton1Click:Connect(function()
 	for itemName,data in pairs(SelectedItems) do
 		if data.Selected then
 			count += 1
-
-			local qty = tonumber(data.QtyBox.Text) or 1
-
-			if qty < 1 then
-				qty = 1
-			end
-
+			local qty = tonumber(data.autoQty) or 1
+			if qty < 1 then qty = 1 end
 			totalItems += qty
 
 			task.spawn(function()
 				local success,msg = pcall(function()
 					return PurchaseEvent:InvokeServer(itemName,qty)
 				end)
-
 				if success then
-					if msg == false
-						or (
-							type(msg) == "string"
-							and (
-								msg:lower():find("gagal")
-								or msg:lower():find("cukup")
-							)
-						) then
-
-						ShowNotif(
-							"Gagal beli "..itemName.." (Saldo/Stok)",
-							true
-						)
+					if msg == false or (type(msg) == "string" and (msg:lower():find("gagal") or msg:lower():find("cukup"))) then
+						ShowNotif("Gagal beli "..itemName.." (Saldo/Stok)",true)
 					else
-						ShowNotif(
-							string.format(
-								"Sukses Membeli %dx %s",
-								qty,
-								itemName
-							)
-						)
+						ShowNotif(string.format("Sukses Membeli %dx %s", qty, itemName))
 					end
 				else
-					ShowNotif(
-						"Gagal transaksi item "..itemName,
-						true
-					)
+					ShowNotif("Gagal transaksi item "..itemName,true)
 				end
 			end)
-
 			task.wait(0.1)
 		end
 	end
@@ -939,13 +1033,7 @@ BuySelectedBtn.MouseButton1Click:Connect(function()
 	if count == 0 then
 		ShowNotif("Pilih minimal 1 item lewat checkbox!",true)
 	else
-		ShowNotif(
-			string.format(
-				"Memproses %d item (%d unit)...",
-				count,
-				totalItems
-			)
-		)
+		ShowNotif(string.format("Memproses %d item (%d unit)...", count, totalItems))
 	end
 end)
 
@@ -953,40 +1041,29 @@ SetupDropdown(DaftarToko)
 
 task.spawn(function()
 	local stages = {
-		{10,"Initializing DV EXPLOITS..."},
-		{25,"Loading player profile..."},
-		{42,"Connecting to economy system..."},
-		{60,"Loading shop database..."},
-		{78,"Preparing item interface..."},
-		{92,"Finalizing system..."},
-		{100,"Ready!"}
+		{10, "Initializing DV EXPLOITS..."},
+		{25, "Loading player profile..."},
+		{42, "Connecting to economy system..."},
+		{60, "Loading shop database..."},
+		{78, "Preparing item interface..."},
+		{92, "Finalizing system..."},
+		{100, "Ready!"}
 	}
 
 	local previous = 0
-
 	for _,stage in ipairs(stages) do
 		local percent = stage[1]
 		local status = stage[2]
-
 		StatusLabel.Text = status
 
-		TweenService:Create(
-			Progress,
-			TweenInfo.new(
-				0.4,
-				Enum.EasingStyle.Quart,
-				Enum.EasingDirection.Out
-			),
-			{
-				Size=UDim2.new(percent/100,0,1,0)
-			}
-		):Play()
+		TweenService:Create(Progress, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+			Size = UDim2.new(percent/100, 0, 1, 0)
+		}):Play()
 
-		for i=previous,percent do
+		for i = previous, percent do
 			PercentLabel.Text = i.."%"
 			task.wait(0.008)
 		end
-
 		previous = percent
 		task.wait(0.1)
 	end
@@ -995,58 +1072,25 @@ task.spawn(function()
 
 	for _,obj in ipairs(LoadingFrame:GetDescendants()) do
 		if obj:IsA("TextLabel") then
-			TweenService:Create(
-				obj,
-				TweenInfo.new(0.35),
-				{TextTransparency=1}
-			):Play()
+			TweenService:Create(obj, TweenInfo.new(0.35), {TextTransparency=1}):Play()
 		elseif obj:IsA("ImageLabel") then
-			TweenService:Create(
-				obj,
-				TweenInfo.new(0.35),
-				{
-					ImageTransparency=1,
-					BackgroundTransparency=1
-				}
-			):Play()
+			TweenService:Create(obj, TweenInfo.new(0.35), {ImageTransparency=1, BackgroundTransparency=1}):Play()
 		elseif obj:IsA("Frame") then
-			TweenService:Create(
-				obj,
-				TweenInfo.new(0.35),
-				{BackgroundTransparency=1}
-			):Play()
+			TweenService:Create(obj, TweenInfo.new(0.35), {BackgroundTransparency=1}):Play()
 		elseif obj:IsA("UIStroke") then
-			TweenService:Create(
-				obj,
-				TweenInfo.new(0.35),
-				{Transparency=1}
-			):Play()
+			TweenService:Create(obj, TweenInfo.new(0.35), {Transparency=1}):Play()
 		end
 	end
 
 	task.wait(0.4)
-
 	LoadingFrame:Destroy()
 
 	MainFrame.Visible = true
 	MainFrame.BackgroundTransparency = 1
-	Stroke.Transparency = 1
+	MainStroke.Transparency = 1
 
-	TweenService:Create(
-		MainFrame,
-		TweenInfo.new(
-			0.4,
-			Enum.EasingStyle.Quart,
-			Enum.EasingDirection.Out
-		),
-		{BackgroundTransparency=0}
-	):Play()
-
-	TweenService:Create(
-		Stroke,
-		TweenInfo.new(0.4),
-		{Transparency=0}
-	):Play()
+	TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {BackgroundTransparency=0}):Play()
+	TweenService:Create(MainStroke, TweenInfo.new(0.4), {Transparency=0}):Play()
 
 	ShowNotif("DV EXPLOITS Buy System Loaded Successfully!")
 end)
