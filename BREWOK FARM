@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
+local VirtualUser = game:GetService("VirtualUser")
 local LocalPlayer = Players.LocalPlayer
 
 pcall(function()
@@ -144,6 +145,7 @@ end
 local _G_AutoFarmActive = false
 local _G_AutoFlyEnabled = false
 local _G_AutoFlyActive = false
+local _G_AntiAfkActive = true
 local _G_ActionDelay = 1.2
 local _G_BurstCount = 1
 local _G_BodyState = "Terlentang"
@@ -736,6 +738,15 @@ LoadBankBtn.MouseButton1Click:Connect(function()
 end)
 
 task.spawn(function()
+    local oldIdled
+    oldIdled = LocalPlayer.Idled:Connect(function()
+        if _G_AntiAfkActive then
+            VirtualUser:Button2Down(Vector2.new(0,0), Workspace.CurrentCamera.CFrame)
+            task.wait(1)
+            VirtualUser:Button2Up(Vector2.new(0,0), Workspace.CurrentCamera.CFrame)
+        end
+    end)
+    
     while true do
         task.wait(_G_ActionDelay)
         
@@ -790,4 +801,3 @@ task.spawn(function()
         end
     end
 end)
-
