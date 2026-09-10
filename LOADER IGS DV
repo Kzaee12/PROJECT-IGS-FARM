@@ -1,266 +1,299 @@
-local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-
 local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-if CoreGui:FindFirstChild("DVExploitsLauncher") then
-    CoreGui.DVExploitsLauncher:Destroy()
+if PlayerGui:FindFirstChild("DameungrrHubLauncher") then
+    PlayerGui.DameungrrHubLauncher:Destroy()
 end
 
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "DVExploitsLauncher"
+screenGui.Name = "DameungrrHubLauncher"
 screenGui.ResetOnSpawn = false
 screenGui.DisplayOrder = 999
-screenGui.Parent = CoreGui
+screenGui.Parent = PlayerGui
+
+local loadingBorderWrapper = Instance.new("Frame")
+loadingBorderWrapper.Parent = screenGui
+loadingBorderWrapper.Size = UDim2.new(0, 380, 0, 215)
+loadingBorderWrapper.Position = UDim2.new(0.5, -190, 0.5, -107)
+loadingBorderWrapper.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+loadingBorderWrapper.BorderSizePixel = 0
+loadingBorderWrapper.ZIndex = 99
+Instance.new("UICorner", loadingBorderWrapper).CornerRadius = UDim.new(0, 16)
+
+local loadBorderGrad = Instance.new("UIGradient")
+loadBorderGrad.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0, 100, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255)),
+})
+loadBorderGrad.Parent = loadingBorderWrapper
+
+task.spawn(function()
+    local rot = 0
+    while loadingBorderWrapper and loadingBorderWrapper.Parent do
+        rot = (rot + 12) % 360
+        loadBorderGrad.Rotation = rot
+        task.wait(0.016)
+    end
+end)
 
 local loadingFrame = Instance.new("Frame")
-loadingFrame.Parent = screenGui
-loadingFrame.BackgroundColor3 = Color3.fromRGB(12, 9, 18)
+loadingFrame.Parent = loadingBorderWrapper
+loadingFrame.BackgroundColor3 = Color3.fromRGB(10, 5, 5)
 loadingFrame.BorderSizePixel = 0
-loadingFrame.Position = UDim2.new(0.5, -140, 0.5, -75)
-loadingFrame.Size = UDim2.new(0, 280, 0, 150)
+loadingFrame.Position = UDim2.new(0, 5, 0, 5)
+loadingFrame.Size = UDim2.new(1, -10, 1, -10)
 loadingFrame.ZIndex = 100
+Instance.new("UICorner", loadingFrame).CornerRadius = UDim.new(0, 12)
 
-local loadingCorner = Instance.new("UICorner")
-loadingCorner.CornerRadius = UDim.new(0, 10)
-loadingCorner.Parent = loadingFrame
+local loadAvatar = Instance.new("ImageLabel")
+loadAvatar.Parent = loadingFrame
+loadAvatar.BackgroundColor3 = Color3.fromRGB(20, 5, 5)
+loadAvatar.Position = UDim2.new(0.5, -32, 0, 15)
+loadAvatar.Size = UDim2.new(0, 64, 0, 64)
+loadAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. LocalPlayer.UserId .. "&w=150&h=150"
+loadAvatar.ZIndex = 101
+Instance.new("UICorner", loadAvatar).CornerRadius = UDim.new(1, 0)
 
-local loadingStroke = Instance.new("UIStroke")
-loadingStroke.Color = Color3.fromRGB(140, 70, 220)
-loadingStroke.Thickness = 1.5
-loadingStroke.Parent = loadingFrame
+local loadAvatarStroke = Instance.new("UIStroke")
+loadAvatarStroke.Parent = loadAvatar
+loadAvatarStroke.Color = Color3.fromRGB(255, 50, 50)
+loadAvatarStroke.Thickness = 2
 
 local loadingTitle = Instance.new("TextLabel")
 loadingTitle.Parent = loadingFrame
 loadingTitle.BackgroundTransparency = 1
-loadingTitle.Position = UDim2.new(0, 10, 0, 25)
-loadingTitle.Size = UDim2.new(1, -20, 0, 28)
+loadingTitle.Position = UDim2.new(0, 10, 0, 85)
+loadingTitle.Size = UDim2.new(1, -20, 0, 25)
 loadingTitle.Font = Enum.Font.GothamBold
-loadingTitle.Text = "DV EXPLOITS"
-loadingTitle.TextColor3 = Color3.fromRGB(190, 120, 255)
-loadingTitle.TextSize = 18
+loadingTitle.Text = "DAMEUNGRR HUB"
+loadingTitle.TextColor3 = Color3.fromRGB(255, 50, 50)
+loadingTitle.TextSize = 17
 loadingTitle.TextXAlignment = Enum.TextXAlignment.Center
 loadingTitle.ZIndex = 101
 
 local loadingSub = Instance.new("TextLabel")
 loadingSub.Parent = loadingFrame
 loadingSub.BackgroundTransparency = 1
-loadingSub.Position = UDim2.new(0, 10, 0, 55)
+loadingSub.Position = UDim2.new(0, 10, 0, 112)
 loadingSub.Size = UDim2.new(1, -20, 0, 18)
 loadingSub.Font = Enum.Font.Code
 loadingSub.Text = "LOADING LAUNCHER..."
-loadingSub.TextColor3 = Color3.fromRGB(140, 120, 165)
-loadingSub.TextSize = 9
+loadingSub.TextColor3 = Color3.fromRGB(180, 100, 100)
+loadingSub.TextSize = 10
 loadingSub.TextXAlignment = Enum.TextXAlignment.Center
 loadingSub.ZIndex = 101
 
 local progressBg = Instance.new("Frame")
 progressBg.Parent = loadingFrame
-progressBg.BackgroundColor3 = Color3.fromRGB(35, 25, 48)
+progressBg.BackgroundColor3 = Color3.fromRGB(30, 10, 10)
 progressBg.BorderSizePixel = 0
-progressBg.Position = UDim2.new(0, 30, 0, 90)
-progressBg.Size = UDim2.new(1, -60, 0, 6)
+progressBg.Position = UDim2.new(0, 30, 0, 142)
+progressBg.Size = UDim2.new(1, -60, 0, 8)
 progressBg.ZIndex = 101
-
-local progressBgCorner = Instance.new("UICorner")
-progressBgCorner.CornerRadius = UDim.new(1, 0)
-progressBgCorner.Parent = progressBg
+Instance.new("UICorner", progressBg).CornerRadius = UDim.new(1, 0)
 
 local progress = Instance.new("Frame")
 progress.Parent = progressBg
-progress.BackgroundColor3 = Color3.fromRGB(150, 60, 230)
+progress.BackgroundColor3 = Color3.fromRGB(255, 40, 40)
 progress.BorderSizePixel = 0
 progress.Size = UDim2.new(0, 0, 1, 0)
 progress.ZIndex = 102
-
-local progressCorner = Instance.new("UICorner")
-progressCorner.CornerRadius = UDim.new(1, 0)
-progressCorner.Parent = progress
+Instance.new("UICorner", progress).CornerRadius = UDim.new(1, 0)
 
 local percentLabel = Instance.new("TextLabel")
 percentLabel.Parent = loadingFrame
 percentLabel.BackgroundTransparency = 1
-percentLabel.Position = UDim2.new(0, 10, 0, 105)
+percentLabel.Position = UDim2.new(0, 10, 0, 158)
 percentLabel.Size = UDim2.new(1, -20, 0, 20)
 percentLabel.Font = Enum.Font.Code
 percentLabel.Text = "0%"
-percentLabel.TextColor3 = Color3.fromRGB(110, 100, 125)
-percentLabel.TextSize = 9
+percentLabel.TextColor3 = Color3.fromRGB(150, 80, 80)
+percentLabel.TextSize = 10
 percentLabel.TextXAlignment = Enum.TextXAlignment.Center
 percentLabel.ZIndex = 101
 
+local mainBorderWrapper = Instance.new("Frame")
+mainBorderWrapper.Parent = screenGui
+mainBorderWrapper.Name = "MainBorder"
+mainBorderWrapper.Size = UDim2.new(0, 350, 0, 275)
+mainBorderWrapper.Position = UDim2.new(0.5, -175, 0.4, -137)
+mainBorderWrapper.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+mainBorderWrapper.BorderSizePixel = 0
+mainBorderWrapper.Visible = false
+mainBorderWrapper.Active = true
+mainBorderWrapper.Draggable = true
+Instance.new("UICorner", mainBorderWrapper).CornerRadius = UDim.new(0, 16)
+
+local mainBorderGrad = Instance.new("UIGradient")
+mainBorderGrad.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0, 100, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255)),
+})
+mainBorderGrad.Parent = mainBorderWrapper
+
+task.spawn(function()
+    local rot = 0
+    while mainBorderWrapper and mainBorderWrapper.Parent do
+        rot = (rot + 12) % 360
+        mainBorderGrad.Rotation = rot
+        task.wait(0.016)
+    end
+end)
+
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Parent = screenGui
-mainFrame.BackgroundColor3 = Color3.fromRGB(20, 15, 25)
+mainFrame.Parent = mainBorderWrapper
+mainFrame.BackgroundColor3 = Color3.fromRGB(12, 6, 6)
 mainFrame.BorderSizePixel = 0
-mainFrame.Position = UDim2.new(0.5, -140, 0.4, -80)
-mainFrame.Size = UDim2.new(0, 280, 0, 230)
-mainFrame.Active = true
-mainFrame.Draggable = true
-mainFrame.Visible = false
-
-local mainCorner = Instance.new("UICorner")
-mainCorner.CornerRadius = UDim.new(0, 12)
-mainCorner.Parent = mainFrame
-
-local border = Instance.new("UIStroke")
-border.Parent = mainFrame
-border.Color = Color3.fromRGB(120, 60, 200)
-border.Thickness = 1.5
-border.Transparency = 0.2
+mainFrame.Position = UDim2.new(0, 5, 0, 5)
+mainFrame.Size = UDim2.new(1, -10, 1, -10)
+mainFrame.Active = false
+mainFrame.Draggable = false
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
 
 local topBar = Instance.new("Frame")
 topBar.Name = "TopBar"
 topBar.Parent = mainFrame
-topBar.BackgroundColor3 = Color3.fromRGB(30, 20, 40)
+topBar.BackgroundColor3 = Color3.fromRGB(25, 8, 8)
 topBar.BorderSizePixel = 0
-topBar.Size = UDim2.new(1, 0, 0, 40)
+topBar.Size = UDim2.new(1, 0, 0, 45)
+Instance.new("UICorner", topBar).CornerRadius = UDim.new(0, 12)
 
-local topCorner = Instance.new("UICorner")
-topCorner.CornerRadius = UDim.new(0, 12)
-topCorner.Parent = topBar
+local iconAvatar = Instance.new("ImageLabel")
+iconAvatar.Parent = topBar
+iconAvatar.BackgroundColor3 = Color3.fromRGB(15, 5, 5)
+iconAvatar.BorderSizePixel = 0
+iconAvatar.Position = UDim2.new(0, 8, 0.5, -13)
+iconAvatar.Size = UDim2.new(0, 26, 0, 26)
+iconAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. LocalPlayer.UserId .. "&w=150&h=150"
+Instance.new("UICorner", iconAvatar).CornerRadius = UDim.new(1, 0)
 
-local iconFrame = Instance.new("Frame")
-iconFrame.Parent = topBar
-iconFrame.BackgroundColor3 = Color3.fromRGB(140, 70, 220)
-iconFrame.BorderSizePixel = 0
-iconFrame.Position = UDim2.new(0, 8, 0.5, -10)
-iconFrame.Size = UDim2.new(0, 20, 0, 20)
-
-local iconCorner = Instance.new("UICorner")
-iconCorner.CornerRadius = UDim.new(1, 0)
-iconCorner.Parent = iconFrame
-
-local iconText = Instance.new("TextLabel")
-iconText.Parent = iconFrame
-iconText.BackgroundTransparency = 1
-iconText.Size = UDim2.new(1, 0, 1, 0)
-iconText.Font = Enum.Font.GothamBold
-iconText.Text = "DV"
-iconText.TextColor3 = Color3.fromRGB(255, 255, 255)
-iconText.TextSize = 10
-iconText.TextScaled = true
+local iconStroke = Instance.new("UIStroke")
+iconStroke.Parent = iconAvatar
+iconStroke.Color = Color3.fromRGB(255, 50, 50)
+iconStroke.Thickness = 1.5
 
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Parent = topBar
 titleLabel.BackgroundTransparency = 1
-titleLabel.Position = UDim2.new(0, 35, 0, 0)
-titleLabel.Size = UDim2.new(0, 180, 1, 0)
+titleLabel.Position = UDim2.new(0, 42, 0, 0)
+titleLabel.Size = UDim2.new(0, 170, 1, 0)
 titleLabel.Font = Enum.Font.GothamBold
-titleLabel.Text = "DV EXPLOITS LAUNCHER"
-titleLabel.TextColor3 = Color3.fromRGB(180, 120, 255)
-titleLabel.TextSize = 12
+titleLabel.Text = "DAMEUNGRR HUB"
+titleLabel.TextColor3 = Color3.fromRGB(255, 70, 70)
+titleLabel.TextSize = 13
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 local minimizeButton = Instance.new("TextButton")
 minimizeButton.Parent = topBar
-minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 40, 80)
-minimizeButton.Position = UDim2.new(1, -80, 0.5, -12)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
+minimizeButton.Position = UDim2.new(1, -85, 0.5, -12)
 minimizeButton.Size = UDim2.new(0, 24, 0, 24)
 minimizeButton.Font = Enum.Font.GothamBold
 minimizeButton.Text = "−"
-minimizeButton.TextColor3 = Color3.fromRGB(200, 180, 255)
+minimizeButton.TextColor3 = Color3.fromRGB(255, 200, 200)
 minimizeButton.TextSize = 16
 minimizeButton.BorderSizePixel = 0
-
-local miniCorner = Instance.new("UICorner")
-miniCorner.CornerRadius = UDim.new(0, 6)
-miniCorner.Parent = minimizeButton
+Instance.new("UICorner", minimizeButton).CornerRadius = UDim.new(0, 6)
 
 local hideButton = Instance.new("TextButton")
 hideButton.Parent = topBar
-hideButton.BackgroundColor3 = Color3.fromRGB(60, 40, 80)
-hideButton.Position = UDim2.new(1, -55, 0.5, -12)
+hideButton.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
+hideButton.Position = UDim2.new(1, -58, 0.5, -12)
 hideButton.Size = UDim2.new(0, 24, 0, 24)
 hideButton.Font = Enum.Font.GothamBold
 hideButton.Text = "◉"
-hideButton.TextColor3 = Color3.fromRGB(200, 180, 255)
+hideButton.TextColor3 = Color3.fromRGB(255, 200, 200)
 hideButton.TextSize = 12
 hideButton.BorderSizePixel = 0
-
-local hideCorner = Instance.new("UICorner")
-hideCorner.CornerRadius = UDim.new(0, 6)
-hideCorner.Parent = hideButton
+Instance.new("UICorner", hideButton).CornerRadius = UDim.new(0, 6)
 
 local closeButton = Instance.new("TextButton")
 closeButton.Parent = topBar
-closeButton.BackgroundColor3 = Color3.fromRGB(180, 40, 60)
-closeButton.Position = UDim2.new(1, -30, 0.5, -12)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
+closeButton.Position = UDim2.new(1, -31, 0.5, -12)
 closeButton.Size = UDim2.new(0, 24, 0, 24)
 closeButton.Font = Enum.Font.GothamBold
 closeButton.Text = "✕"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.TextSize = 14
 closeButton.BorderSizePixel = 0
-
-local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(0, 6)
-closeCorner.Parent = closeButton
+Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 6)
 
 local contentContainer = Instance.new("Frame")
 contentContainer.Parent = mainFrame
 contentContainer.BackgroundTransparency = 1
-contentContainer.Position = UDim2.new(0, 0, 0, 40)
-contentContainer.Size = UDim2.new(1, 0, 1, -40)
+contentContainer.Position = UDim2.new(0, 0, 0, 45)
+contentContainer.Size = UDim2.new(1, 0, 1, -45)
 
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Parent = contentContainer
 statusLabel.BackgroundTransparency = 1
-statusLabel.Position = UDim2.new(0, 10, 0, 5)
+statusLabel.Position = UDim2.new(0, 10, 0, 8)
 statusLabel.Size = UDim2.new(1, -20, 0, 20)
 statusLabel.Font = Enum.Font.Gotham
-statusLabel.Text = "🚀 Pilih Script yang Mau Di Load"
-statusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+statusLabel.Text = "🔥 Pilih Script yang Mau Di Load"
+statusLabel.TextColor3 = Color3.fromRGB(220, 160, 160)
 statusLabel.TextSize = 11
 statusLabel.TextXAlignment = Enum.TextXAlignment.Center
 
 local deliveryToggle = Instance.new("TextButton")
 deliveryToggle.Parent = contentContainer
-deliveryToggle.BackgroundColor3 = Color3.fromRGB(50, 30, 70)
-deliveryToggle.Position = UDim2.new(0, 15, 0, 32)
-deliveryToggle.Size = UDim2.new(1, -30, 0, 34)
+deliveryToggle.BackgroundColor3 = Color3.fromRGB(40, 12, 12)
+deliveryToggle.Position = UDim2.new(0, 15, 0, 35)
+deliveryToggle.Size = UDim2.new(1, -30, 0, 38)
 deliveryToggle.Font = Enum.Font.GothamBold
 deliveryToggle.Text = "🚚 LOAD DELIVERY FARMING"
-deliveryToggle.TextColor3 = Color3.fromRGB(200, 180, 255)
+deliveryToggle.TextColor3 = Color3.fromRGB(255, 180, 180)
 deliveryToggle.TextSize = 11
 deliveryToggle.BorderSizePixel = 0
-
-local delCorner = Instance.new("UICorner")
-delCorner.CornerRadius = UDim.new(0, 8)
-delCorner.Parent = deliveryToggle
+Instance.new("UICorner", deliveryToggle).CornerRadius = UDim.new(0, 8)
 
 local brewokToggle = Instance.new("TextButton")
 brewokToggle.Parent = contentContainer
-brewokToggle.BackgroundColor3 = Color3.fromRGB(50, 30, 70)
-brewokToggle.Position = UDim2.new(0, 15, 0, 74)
-brewokToggle.Size = UDim2.new(1, -30, 0, 34)
+brewokToggle.BackgroundColor3 = Color3.fromRGB(40, 12, 12)
+brewokToggle.Position = UDim2.new(0, 15, 0, 80)
+brewokToggle.Size = UDim2.new(1, -30, 0, 38)
 brewokToggle.Font = Enum.Font.GothamBold
 brewokToggle.Text = "🍺 LOAD BREWOK FARMING"
-brewokToggle.TextColor3 = Color3.fromRGB(200, 180, 255)
+brewokToggle.TextColor3 = Color3.fromRGB(255, 180, 180)
 brewokToggle.TextSize = 11
 brewokToggle.BorderSizePixel = 0
-
-local brewCorner = Instance.new("UICorner")
-brewCorner.CornerRadius = UDim.new(0, 8)
-brewCorner.Parent = brewokToggle
+Instance.new("UICorner", brewokToggle).CornerRadius = UDim.new(0, 8)
 
 local buyToggle = Instance.new("TextButton")
 buyToggle.Parent = contentContainer
-buyToggle.BackgroundColor3 = Color3.fromRGB(50, 30, 70)
-buyToggle.Position = UDim2.new(0, 15, 0, 116)
-buyToggle.Size = UDim2.new(1, -30, 0, 34)
+buyToggle.BackgroundColor3 = Color3.fromRGB(40, 12, 12)
+buyToggle.Position = UDim2.new(0, 15, 0, 125)
+buyToggle.Size = UDim2.new(1, -30, 0, 38)
 buyToggle.Font = Enum.Font.GothamBold
 buyToggle.Text = "🛒 LOAD BUY SYSTEM"
-buyToggle.TextColor3 = Color3.fromRGB(200, 180, 255)
+buyToggle.TextColor3 = Color3.fromRGB(255, 180, 180)
 buyToggle.TextSize = 11
 buyToggle.BorderSizePixel = 0
+Instance.new("UICorner", buyToggle).CornerRadius = UDim.new(0, 8)
 
-local buyCorner = Instance.new("UICorner")
-buyCorner.CornerRadius = UDim.new(0, 8)
-buyCorner.Parent = buyToggle
+local creditLabel = Instance.new("TextLabel")
+creditLabel.Parent = contentContainer
+creditLabel.BackgroundTransparency = 1
+creditLabel.Position = UDim2.new(0, 10, 1, -26)
+creditLabel.Size = UDim2.new(1, -20, 0, 20)
+creditLabel.Font = Enum.Font.GothamBold
+creditLabel.Text = "⚡ Powered by DV Exploits ⚡"
+creditLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
+creditLabel.TextSize = 12
+creditLabel.TextXAlignment = Enum.TextXAlignment.Center
 
 local isMinimized = false
 local isHidden = false
@@ -268,96 +301,48 @@ local isHidden = false
 local hideIcon = Instance.new("TextButton")
 hideIcon.Name = "HideIcon"
 hideIcon.Parent = screenGui
-hideIcon.BackgroundColor3 = Color3.fromRGB(30, 20, 40)
+hideIcon.BackgroundColor3 = Color3.fromRGB(20, 8, 8)
 hideIcon.BorderSizePixel = 0
 hideIcon.Position = UDim2.new(0, 15, 0.5, -25)
-hideIcon.Size = UDim2.new(0, 50, 0, 50)
+hideIcon.Size = UDim2.new(0, 52, 0, 52)
 hideIcon.Font = Enum.Font.GothamBold
-hideIcon.Text = "DV"
-hideIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
-hideIcon.TextSize = 15
+hideIcon.Text = "⚡"
+hideIcon.TextColor3 = Color3.fromRGB(255, 215, 0)
+hideIcon.TextSize = 24
 hideIcon.Visible = false
 hideIcon.ZIndex = 200
 hideIcon.AutoButtonColor = false
-
-local hideIconCorner = Instance.new("UICorner")
-hideIconCorner.CornerRadius = UDim.new(1, 0)
-hideIconCorner.Parent = hideIcon
+Instance.new("UICorner", hideIcon).CornerRadius = UDim.new(1, 0)
 
 local hideIconStroke = Instance.new("UIStroke")
 hideIconStroke.Parent = hideIcon
-hideIconStroke.Color = Color3.fromRGB(140, 70, 220)
-hideIconStroke.Thickness = 2
-
-local hideIconGradient = Instance.new("UIGradient")
-hideIconGradient.Parent = hideIcon
-hideIconGradient.Rotation = 45
-hideIconGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 40, 160)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(170, 80, 240))
-})
+hideIconStroke.Color = Color3.fromRGB(255, 215, 0)
+hideIconStroke.Thickness = 2.5
 
 local function resetStatus()
     task.wait(1.5)
-
     if screenGui.Parent and not isHidden then
-        statusLabel.Text = "🚀 Pilih Script yang Mau Di Load"
-        statusLabel.TextColor3 = Color3.fromRGB(180, 160, 210)
+        statusLabel.Text = "🔥 Pilih Script yang Mau Di Load"
+        statusLabel.TextColor3 = Color3.fromRGB(220, 160, 160)
     end
 end
 
 local function showLauncher()
     isHidden = false
     hideIcon.Visible = false
-    mainFrame.Visible = true
-
-    mainFrame.BackgroundTransparency = 1
-    border.Transparency = 1
-
-    TweenService:Create(
-        mainFrame,
-        TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-        {BackgroundTransparency = 0}
-    ):Play()
-
-    TweenService:Create(
-        border,
-        TweenInfo.new(0.3),
-        {Transparency = 0.2}
-    ):Play()
+    mainBorderWrapper.Visible = true
 end
 
 local function hideLauncher()
     isHidden = true
-
-    local fade = TweenService:Create(
-        mainFrame,
-        TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.In),
-        {BackgroundTransparency = 1}
-    )
-
+    mainBorderWrapper.Visible = false
+    hideIcon.Visible = true
+    hideIcon.Size = UDim2.new(0, 0, 0, 0)
     TweenService:Create(
-        border,
-        TweenInfo.new(0.25),
-        {Transparency = 1}
+        hideIcon,
+        TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        {Size = UDim2.new(0, 52, 0, 52)}
     ):Play()
-
-    fade:Play()
-
-    fade.Completed:Connect(function()
-        if isHidden and screenGui.Parent then
-            mainFrame.Visible = false
-            hideIcon.Visible = true
-
-            hideIcon.Size = UDim2.new(0, 0, 0, 0)
-
-            TweenService:Create(
-                hideIcon,
-                TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-                {Size = UDim2.new(0, 50, 0, 50)}
-            ):Play()
-        end
-    end)
 end
 
 hideButton.MouseButton1Click:Connect(function()
@@ -370,200 +355,126 @@ end)
 
 minimizeButton.MouseButton1Click:Connect(function()
     isMinimized = not isMinimized
-
     contentContainer.Visible = not isMinimized
-
-    mainFrame.Size = isMinimized
-        and UDim2.new(0, 280, 0, 40)
-        or UDim2.new(0, 280, 0, 230)
-
+    mainBorderWrapper.Size = isMinimized
+        and UDim2.new(0, 350, 0, 45)
+        or UDim2.new(0, 350, 0, 275)
     minimizeButton.Text = isMinimized and "⊕" or "−"
 end)
 
 closeButton.MouseButton1Click:Connect(function()
     screenGui:Destroy()
-
-    if CoreGui:FindFirstChild("DVExploitsDelivery") then
-        CoreGui.DVExploitsDelivery:Destroy()
-    end
-
-    if CoreGui:FindFirstChild("DVExploitsBrewok") then
-        CoreGui.DVExploitsBrewok:Destroy()
-    end
-
-    if CoreGui:FindFirstChild("DVExploitsShopPro") then
-        CoreGui.DVExploitsShopPro:Destroy()
-    end
+    if PlayerGui:FindFirstChild("DVExploitsDelivery") then PlayerGui.DVExploitsDelivery:Destroy() end
+    if PlayerGui:FindFirstChild("DVExploitsBrewok") then PlayerGui.DVExploitsBrewok:Destroy() end
+    if PlayerGui:FindFirstChild("DVExploitsShopPro") then PlayerGui.DVExploitsShopPro:Destroy() end
 end)
 
 deliveryToggle.MouseButton1Click:Connect(function()
-    if CoreGui:FindFirstChild("DVExploitsDelivery") then
+    if PlayerGui:FindFirstChild("DVExploitsDelivery") then
         statusLabel.Text = "⚠️ Delivery Sudah Active!"
         statusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
         task.spawn(resetStatus)
         return
     end
-
     statusLabel.Text = "⏳ Loading Delivery..."
-    statusLabel.TextColor3 = Color3.fromRGB(200, 180, 255)
-
+    statusLabel.TextColor3 = Color3.fromRGB(255, 200, 200)
     local success = pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Kzaee12/PROJECT-IGS-FARM/refs/heads/main/DELIVERY%20FARM"))()
     end)
-
     if success then
         statusLabel.Text = "✅ Delivery Loaded!"
         statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-        deliveryToggle.BackgroundColor3 = Color3.fromRGB(80, 40, 120)
+        deliveryToggle.BackgroundColor3 = Color3.fromRGB(70, 20, 20)
     else
         statusLabel.Text = "❌ Gagal Load Delivery!"
         statusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
     end
-
     task.spawn(resetStatus)
 end)
 
 brewokToggle.MouseButton1Click:Connect(function()
-    if CoreGui:FindFirstChild("DVExploitsBrewok") then
+    if PlayerGui:FindFirstChild("DVExploitsBrewok") then
         statusLabel.Text = "⚠️ Brewok Sudah Active!"
         statusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
         task.spawn(resetStatus)
         return
     end
-
     statusLabel.Text = "⏳ Loading Brewok..."
-    statusLabel.TextColor3 = Color3.fromRGB(200, 180, 255)
-
+    statusLabel.TextColor3 = Color3.fromRGB(255, 200, 200)
     local success = pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Kzaee12/PROJECT-IGS-FARM/refs/heads/main/BREWOK%20FARM"))()
     end)
-
     if success then
         statusLabel.Text = "✅ Brewok Loaded!"
         statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-        brewokToggle.BackgroundColor3 = Color3.fromRGB(80, 40, 120)
+        brewokToggle.BackgroundColor3 = Color3.fromRGB(70, 20, 20)
     else
         statusLabel.Text = "❌ Gagal Load Brewok!"
         statusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
     end
-
     task.spawn(resetStatus)
 end)
 
 buyToggle.MouseButton1Click:Connect(function()
-    if CoreGui:FindFirstChild("DVExploitsShopPro") then
+    if PlayerGui:FindFirstChild("DVExploitsShopPro") then
         statusLabel.Text = "⚠️ Buy System Sudah Active!"
         statusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
         task.spawn(resetStatus)
         return
     end
-
     statusLabel.Text = "⏳ Loading Buy System..."
-    statusLabel.TextColor3 = Color3.fromRGB(200, 180, 255)
-
+    statusLabel.TextColor3 = Color3.fromRGB(255, 200, 200)
     local success = pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Kzaee12/PROJECT-IGS-FARM/refs/heads/main/BUY%20SYSTEM"))()
     end)
-
     if success then
         statusLabel.Text = "✅ Buy System Loaded!"
         statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-        buyToggle.BackgroundColor3 = Color3.fromRGB(80, 40, 120)
+        buyToggle.BackgroundColor3 = Color3.fromRGB(70, 20, 20)
     else
         statusLabel.Text = "❌ Gagal Load Buy System!"
         statusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
     end
-
     task.spawn(resetStatus)
 end)
 
 local dragging = false
-local dragStart
-local startPos
+local dragStart, startPos
 
 hideIcon.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-        or input.UserInputType == Enum.UserInputType.Touch then
-
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = false
         dragStart = input.Position
         startPos = hideIcon.Position
-
-        local connection
-
-        connection = input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                if connection then
-                    connection:Disconnect()
-                end
-            end
-        end)
     end
 end)
 
-hideIcon.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement
-        or input.UserInputType == Enum.UserInputType.Touch then
-
-        local moveConnection
-
-        moveConnection = UserInputService.InputChanged:Connect(function(changedInput)
-            if changedInput ~= input then
-                return
-            end
-
-            if not dragStart or not startPos then
-                return
-            end
-
-            local delta = changedInput.Position - dragStart
-
-            if math.abs(delta.X) > 5 or math.abs(delta.Y) > 5 then
-                dragging = true
-            end
-
-            if dragging then
-                hideIcon.Position = UDim2.new(
-                    startPos.X.Scale,
-                    startPos.X.Offset + delta.X,
-                    startPos.Y.Scale,
-                    startPos.Y.Offset + delta.Y
-                )
-            end
-        end)
-
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                if moveConnection then
-                    moveConnection:Disconnect()
-                end
-            end
-        end)
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        if math.abs(delta.X) > 5 or math.abs(delta.Y) > 5 then
+            dragging = true
+        end
+        if dragging then
+            hideIcon.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
+        end
     end
 end)
 
 hideIcon.MouseButton1Click:Connect(function()
-    if dragging then
-        return
-    end
-
+    if dragging then return end
     showLauncher()
 end)
 
 hideIcon.MouseEnter:Connect(function()
-    TweenService:Create(
-        hideIcon,
-        TweenInfo.new(0.15),
-        {Size = UDim2.new(0, 55, 0, 55)}
-    ):Play()
+    TweenService:Create(hideIcon, TweenInfo.new(0.15), {Size = UDim2.new(0, 56, 0, 56)}):Play()
 end)
 
 hideIcon.MouseLeave:Connect(function()
-    TweenService:Create(
-        hideIcon,
-        TweenInfo.new(0.15),
-        {Size = UDim2.new(0, 50, 0, 50)}
-    ):Play()
+    TweenService:Create(hideIcon, TweenInfo.new(0.15), {Size = UDim2.new(0, 52, 0, 52)}):Play()
 end)
 
 task.spawn(function()
@@ -575,74 +486,24 @@ task.spawn(function()
         {90, "Finalizing..."},
         {100, "Ready!"}
     }
-
     local previous = 0
-
     for _, stage in ipairs(stages) do
         local percent = stage[1]
         local text = stage[2]
-
         loadingSub.Text = text
-
         TweenService:Create(
             progress,
-            TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {
-                Size = UDim2.new(percent / 100, 0, 1, 0)
-            }
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(percent / 100, 0, 1, 0)}
         ):Play()
-
         for i = previous, percent do
             percentLabel.Text = i .. "%"
-            task.wait(0.008)
+            task.wait(0.006)
         end
-
         previous = percent
         task.wait(0.1)
     end
-
-    task.wait(0.4)
-
-    for _, obj in ipairs(loadingFrame:GetDescendants()) do
-        if obj:IsA("TextLabel") then
-            TweenService:Create(
-                obj,
-                TweenInfo.new(0.35),
-                {TextTransparency = 1}
-            ):Play()
-        elseif obj:IsA("Frame") then
-            TweenService:Create(
-                obj,
-                TweenInfo.new(0.35),
-                {BackgroundTransparency = 1}
-            ):Play()
-        elseif obj:IsA("UIStroke") then
-            TweenService:Create(
-                obj,
-                TweenInfo.new(0.35),
-                {Transparency = 1}
-            ):Play()
-        end
-    end
-
-    task.wait(0.4)
-
-    loadingFrame:Destroy()
-    mainFrame.Visible = true
-    mainFrame.BackgroundTransparency = 1
-    border.Transparency = 1
-
-    TweenService:Create(
-        mainFrame,
-        TweenInfo.new(0.45, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-        {BackgroundTransparency = 0}
-    ):Play()
-
-    TweenService:Create(
-        border,
-        TweenInfo.new(0.45),
-        {Transparency = 0.2}
-    ):Play()
+    task.wait(0.3)
+    loadingBorderWrapper:Destroy()
+    mainBorderWrapper.Visible = true
 end)
-
-print("[DV EXPLOITS] Launcher Hub Loaded!")
