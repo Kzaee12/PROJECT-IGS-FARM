@@ -189,6 +189,7 @@ local _lastProgressTick = tick()
 local _loopGeneration = 0
 local _restarting = false
 local _jobStartTime = 0
+local _pauseTime = 0
 
 local _G_AutoFarmBrewok = false
 local _G_AutoFlyEnabled = false
@@ -750,25 +751,45 @@ local function flyToPosition(vehicle, targetPos, label)
         AD_PhaseLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
     end
     
-    pcall(function()
-        local rayOrigin = primaryPart.Position
-        local rayDir = Vector3.new(0, -50, 0)
-        local rayParams = RaycastParams.new()
-        rayParams.FilterDescendantsInstances = {vehicle, LocalPlayer.Character}
-        rayParams.FilterType = Enum.RaycastFilterType.Exclude
-        
-        local result = Workspace:Raycast(rayOrigin, rayDir, rayParams)
-        if result then
-            local distToGround = result.Distance
-            local targetY = primaryPart.Position.Y - distToGround + 2.5
-            primaryPart.CFrame = CFrame.new(targetPos.X, targetY, targetPos.Z)
-        else
-            primaryPart.CFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
-        end
+    -- LAND: raycast dari ATAS target
+pcall(function()
+    local rayParams = RaycastParams.new()
+    rayParams.FilterDescendantsInstances = {vehicle, LocalPlayer.Character}
+    rayParams.FilterType = Enum.RaycastFilterType.Exclude
+    
+    local rayOrigin = Vector3.new(targetPos.X, targetPos.Y + 200, targetPos.Z)
+    local result = Workspace:Raycast(rayOrigin, Vector3.new(0, -400, 0), rayParams)
+    
+    local landY
+    if result then
+        landY = result.Position.Y + 3
+    else
+        landY = targetPos.Y + 3
+    end
+    
+    primaryPart.CFrame = CFrame.new(targetPos.X, landY, targetPos.Z)
+    primaryPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+    primaryPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+end)
+task.wait(0.3)
+
+-- FORCE GROUND SNAP (double check)
+pcall(function()
+    local rayParams = RaycastParams.new()
+    rayParams.FilterDescendantsInstances = {vehicle, LocalPlayer.Character}
+    rayParams.FilterType = Enum.RaycastFilterType.Exclude
+    
+    local rayOrigin = Vector3.new(targetPos.X, targetPos.Y + 200, targetPos.Z)
+    local result = Workspace:Raycast(rayOrigin, Vector3.new(0, -400, 0), rayParams)
+    
+    if result then
+        local finalY = result.Position.Y + 3
+        primaryPart.CFrame = CFrame.new(targetPos.X, finalY, targetPos.Z)
         primaryPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
         primaryPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-    end)
-    task.wait(0.3)
+    end
+end)
+task.wait(0.1)
     
     if noClipEnabled then
         pcall(function()
@@ -783,8 +804,8 @@ local function flyToPosition(vehicle, targetPos, label)
     end
     
     local freezeStart = tick()
-    local freezeMaxTime = 20
-    local freezeTargetPos = primaryPart.Position
+local freezeMaxTime = 20
+local freezeTargetPos = Vector3.new(targetPos.X, primaryPart.Position.Y, targetPos.Z)
     local TOLERANCE = 0.5
     
     local freezeGyro = Instance.new("BodyGyro")
@@ -849,10 +870,14 @@ local function autoRunJob()
     end
     
     while autoDriveActive and myGen == _loopGeneration do
-        _lastProgressTick = tick()
-        _jobStartTime = tick()
-        
-        if not adTargetPos then
+    _lastProgressTick = tick()
+    _jobStartTime = tick()
+    
+    -- Resume check: kalau ada state aktif, skip trigger
+    local hasActiveJob = (adTargetPos ~= nil) or (adFinishPos ~= nil) 
+        or (currentTargetPosition ~= nil)
+    
+    if (not adTargetPos) and (not hasActiveJob) then
             if AD_StatusLabel then
                 AD_StatusLabel.Text = "🔄 Trigger job..."
                 AD_StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
@@ -924,50 +949,63 @@ local function autoRunJob()
         end
         
         if not autoDriveActive then break end
-        _lastProgressTick = tick()
-        
-        local humCheck2 = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-        if not humCheck2 or not humCheck2.SeatPart then
-            sitInVehicle()
-            task.wait(0.3)
-        end
-        
+_lastProgressTick = tick()
+
+local humCheck2 = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+if not humCheck2 or not humCheck2.SeatPart then
+    sitInVehicle()
+    task.wait(0.3)
+end
+
+-- ⚠️ RESUME CHECK: kalau adTargetPos nil (resume pas RETURNING), skip fase target
+if not adTargetPos then
+    if AD_StatusLabel then
+        AD_StatusLabel.Text = "♻️ Resume — skip target, langsung finish"
+        AD_StatusLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
+        AD_LED.BackgroundColor3 = Color3.fromRGB(100, 200, 255)
+    end
+    -- Skip fase ke-target, langsung cek finish
+else
+    if AD_StatusLabel then
+        AD_StatusLabel.Text = "🎯 Ke TARGET..."
+        AD_StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
+        AD_LED.BackgroundColor3 = Color3.fromRGB(255, 200, 100)
+    end
+    
+    local vehicle = getMyVehicle()
+    if not vehicle then
         if AD_StatusLabel then
-            AD_StatusLabel.Text = "🎯 Ke TARGET..."
+            AD_StatusLabel.Text = "❌ Mobil ilang, retry..."
+            AD_StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+            AD_LED.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+        end
+        adTargetPos = nil
+        adFinishPos = nil
+        task.wait(2)
+        continue
+    end
+    
+    local ok = flyToPosition(vehicle, adTargetPos, "TARGET")
+    if not autoDriveActive then break end
+    _lastProgressTick = tick()
+    
+    if ok then
+        if AD_StatusLabel then
+            AD_StatusLabel.Text = "⏳ Nunggu konfirm target..."
             AD_StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
-            AD_LED.BackgroundColor3 = Color3.fromRGB(255, 200, 100)
         end
-        
-        local vehicle = getMyVehicle()
-        if not vehicle then
-            if AD_StatusLabel then
-                AD_StatusLabel.Text = "❌ Mobil ilang, retry..."
-                AD_StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-                AD_LED.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
-            end
-            adTargetPos = nil
-            adFinishPos = nil
-            task.wait(2)
-            continue
-        end
-        
-        local ok = flyToPosition(vehicle, adTargetPos, "TARGET")
-        if not autoDriveActive then break end
-        _lastProgressTick = tick()
-        
-        if ok then
-            if AD_StatusLabel then
-                AD_StatusLabel.Text = "⏳ Nunggu konfirm target..."
-                AD_StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
-            end
-            waitForJobState("WAITING", 15)
-        end
-        
-        if not autoDriveActive then break end
-        _lastProgressTick = tick()
-        
-        if AD_StatusLabel then
-            AD_StatusLabel.Text = "⏳ Nunggu finish pos..."
+        waitForJobState("WAITING", 15)
+    end
+    
+    if not autoDriveActive then break end
+    _lastProgressTick = tick()
+end
+
+if not autoDriveActive then break end
+_lastProgressTick = tick()
+
+if AD_StatusLabel then
+    AD_StatusLabel.Text = "⏳ Nunggu finish pos..."
             AD_StatusLabel.TextColor3 = Color3.fromRGB(200, 200, 255)
             AD_LED.BackgroundColor3 = Color3.fromRGB(200, 200, 255)
         end
@@ -1023,12 +1061,36 @@ local function autoRunJob()
         _lastProgressTick = tick()
         
         if okFinish then
-            if AD_StatusLabel then
-                AD_StatusLabel.Text = "⏳ Nunggu reward..."
-                AD_StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
+    if AD_StatusLabel then
+        AD_StatusLabel.Text = "⏳ Nunggu reward..."
+        AD_StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
+    end
+    
+    -- Diemin mobil di finish, tarik balik kalau geser >5 stud
+    local waited = 0
+    local maxWait = 25
+    local lockedFinishPos = adFinishPos
+    
+    while autoDriveActive and waited < maxWait do
+        if jobState == "NONE" then break end
+        task.wait(0.5)
+        waited = waited + 0.5
+        
+        local v = getMyVehicle()
+        if v and v.PrimaryPart and lockedFinishPos then
+            local cur = v.PrimaryPart.Position
+            local tgt = Vector3.new(lockedFinishPos.X, cur.Y, lockedFinishPos.Z)
+            local dist = (cur - tgt).Magnitude
+            if dist > 5 then
+                pcall(function()
+                    v.PrimaryPart.CFrame = CFrame.new(tgt)
+                    v.PrimaryPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                    v.PrimaryPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                end)
             end
-            waitForJobComplete(20)
         end
+    end
+end
         
         if not autoDriveActive then break end
         _lastProgressTick = tick()
@@ -1913,9 +1975,25 @@ end)
 
 AD_StartBtn.MouseButton1Click:Connect(function()
     if not autoDriveActive then
-        autoDriveActive = true
         _loopGeneration = _loopGeneration + 1
+        task.wait(0.3)
+        
+        local pauseDuration = _pauseTime > 0 and (tick() - _pauseTime) or 0
+        if pauseDuration > 60 then
+            warn("[DV] Pause >60s, reset state")
+            adTargetPos = nil
+            adFinishPos = nil
+            currentTargetPosition = nil
+            jobState = "NONE"
+            currentJobId = nil
+        end
+        
+        local hasActiveState = (adTargetPos ~= nil) or (adFinishPos ~= nil) 
+            or (currentTargetPosition ~= nil) or (jobState ~= "NONE")
+        
+        autoDriveActive = true
         _restarting = false
+        _pauseTime = 0
         AD_StartBtn.Text = "🔴 STOP"
         AD_StartBtn.BackgroundColor3 = Color3.fromRGB(100, 40, 40)
         sessionStartTime = tick()
@@ -1931,24 +2009,28 @@ AD_StartBtn.MouseButton1Click:Connect(function()
             task.wait(0.5)
         end
         
-        AD_StatusLabel.Text = "🟢 Auto-Loop started!"
-        AD_StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-        AD_LED.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+        if hasActiveState then
+            AD_StatusLabel.Text = "♻️ Resume job..."
+            AD_StatusLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
+            AD_LED.BackgroundColor3 = Color3.fromRGB(100, 200, 255)
+            warn("[DV] Resume state:", jobState)
+        else
+            AD_StatusLabel.Text = "🟢 Auto-Loop started!"
+            AD_StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+            AD_LED.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+        end
         
         task.spawn(autoRunJob)
     else
         autoDriveActive = false
         _loopGeneration = _loopGeneration + 1
         _restarting = false
-        adTargetPos = nil
-        adFinishPos = nil
-        currentTargetPosition = nil
-        jobState = "NONE"
+        _pauseTime = tick()
         AD_StartBtn.Text = "🟢 AUTO START"
         AD_StartBtn.BackgroundColor3 = Color3.fromRGB(40, 80, 40)
-        AD_StatusLabel.Text = "⏸️ Stopped"
-        AD_StatusLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
-        AD_LED.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+        AD_StatusLabel.Text = "⏸️ Paused (state preserved)"
+        AD_StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
+        AD_LED.BackgroundColor3 = Color3.fromRGB(255, 200, 100)
         AD_PhaseLabel.Text = "🎯 Phase: —"
         
         pcall(function()
@@ -2141,16 +2223,20 @@ local function executeReturnToFinish(targetPos)
             task.wait(0.15)
             if LockSeatEnabled then lockSeat_forceSit(humanoid, vehicle) end
         end
-        waitForJobComplete(20)
-        unlockVehicle(vehicle)
-        pcall(function()
-            local seat = humanoid.SeatPart
-            if seat then seat:Sit() end
-        end)
-        if statusText then
-            statusText.Text = "✅ Reward selesai, ulang..."
-            statusText.TextColor3 = Color3.fromRGB(100, 255, 100)
-        end
+        local unlockWait = tick()
+while autoDeliveryActive and (tick() - unlockWait) < 25 do
+    if jobState == "NONE" then break end
+    task.wait(0.3)
+end
+unlockVehicle(vehicle)
+pcall(function()
+    local seat = humanoid.SeatPart
+    if seat then seat:Sit() end
+end)
+if statusText then
+    statusText.Text = "✅ Reward selesai, ulang..."
+    statusText.TextColor3 = Color3.fromRGB(100, 255, 100)
+end
     end)
 end
 
@@ -2771,14 +2857,19 @@ if deliveryRemote then
                 end)
             end
         elseif typeof(param1) == "Vector3" then
-            if param2 == nil or param2 == currentJobId then
-                currentTargetPosition = param1
-                if jobState == "RETURNING" then
-                    adFinishPos = param1
-                else
-                    adTargetPos = param1
-                end
+    if param2 == nil or param2 == currentJobId then
+        currentTargetPosition = param1
+        if jobState == "RETURNING" then
+            if not adFinishPos then
+                adFinishPos = param1
+                warn("[DV] Finish pos LOCKED:", adFinishPos)
             end
+        else
+            if not adTargetPos then
+                adTargetPos = param1
+            end
+        end
+    end
         elseif param1 == nil then
             jobState = "NONE"
             currentTargetPosition = nil
@@ -2885,4 +2976,4 @@ LocalPlayer.CharacterRemoving:Connect(function()
     _lastProgressTick = tick()
 end)
 
-print("DV EXPLOITS FARM IGR LOADED ☠️ - FIX v3")
+print("DV EXPLOITS FARM IGR LOADED ☠️ - FIX")
